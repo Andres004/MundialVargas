@@ -4,70 +4,56 @@ import { createClient } from '@supabase/supabase-js';
 
 const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_publishable_OGy26eyySr3gpRsKC1imtA_iOzL_0Hm');
 
+// =========================================================================
+// ⚙️ CONFIGURACIÓN DEL ADMINISTRADOR (TÚ)
+// =========================================================================
+
+// 1. Si ayer sobró plata porque nadie acertó, ponla aquí (ej: 15). Si no, déjalo en 0.
+const POZO_AYER = 0; 
+const PRECIO_POR_PARTIDO = 3; 
+
+// 2. TÚ ERES LA API: Modifica aquí los marcadores cuando acaben los partidos reales 
+// y cambia el status de 'PENDING' a 'FINISHED'. Luego haces git push.
+const PARTIDOS_DE_HOY = [
+  { id: 101, home_team: 'Suiza', away_team: 'Canadá', home_flag: 'https://flagcdn.com/w80/ch.png', away_flag: 'https://flagcdn.com/w80/ca.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 102, home_team: 'Bosnia', away_team: 'Catar', home_flag: 'https://flagcdn.com/w80/ba.png', away_flag: 'https://flagcdn.com/w80/qa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 103, home_team: 'Marruecos', away_team: 'Haití', home_flag: 'https://flagcdn.com/w80/ma.png', away_flag: 'https://flagcdn.com/w80/ht.png', home_score: 0, away_score: 0, status: 'PENDING', time: '18:00' },
+  { id: 104, home_team: 'Escocia', away_team: 'Brasil', home_flag: 'https://flagcdn.com/w80/gb-sct.png', away_flag: 'https://flagcdn.com/w80/br.png', home_score: 0, away_score: 0, status: 'PENDING', time: '18:00' },
+  { id: 105, home_team: 'Sudáfrica', away_team: 'Corea Sur', home_flag: 'https://flagcdn.com/w80/za.png', away_flag: 'https://flagcdn.com/w80/kr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '21:00' },
+  { id: 106, home_team: 'R. Checa', away_team: 'México', home_flag: 'https://flagcdn.com/w80/cz.png', away_flag: 'https://flagcdn.com/w80/mx.png', home_score: 0, away_score: 0, status: 'PENDING', time: '21:00' }
+];
+
 export default function App() {
-  const [user, setUser] = useState(localStorage.getItem('pollaUser') || '');
+  const hoyStr = new Date().toLocaleDateString('es-BO'); // Ej: "24/6/2026"
+  const datosGuardados = JSON.parse(localStorage.getItem('pollaData') || '{}');
+  
+  // Si la fecha guardada no es de hoy, obliga a poner el nombre de nuevo
+  const [user, setUser] = useState(datosGuardados.fecha === hoyStr ? datosGuardados.nombre : '');
   const [nameInput, setNameInput] = useState('');
-  const [matches, setMatches] = useState([]);
+  
+  const [matches, setMatches] = useState(PARTIDOS_DE_HOY);
   const [predictions, setPredictions] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const PRECIO_POR_PARTIDO = 3; // 3 Bs por partido
-
   useEffect(() => {
-    // Reloj interno para calcular los 5 minutos en tiempo real
-    const timer = setInterval(() => setCurrentTime(new Date()), 30000); // Actualiza cada 30 seg
+    const timer = setInterval(() => setCurrentTime(new Date()), 30000);
     
     if (user) {
-      fetchMatches();
       fetchPredictions();
-      
-      // Intentar actualizar marcadores desde la API cada 1 minuto
-      const apiInterval = setInterval(() => fetchMatches(), 60000);
-
-      // Escuchar la base de datos en tiempo real
       const channel = supabase
-        .channel('public-predictions')
+        .channel('public-changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'predictions' }, () => {
           fetchPredictions();
         })
         .subscribe();
-
-      return () => {
-        clearInterval(timer);
-        clearInterval(apiInterval);
-        supabase.removeChannel(channel);
-      };
+      return () => { clearInterval(timer); supabase.removeChannel(channel); };
     }
     return () => clearInterval(timer);
   }, [user]);
 
-  const fetchMatches = async () => {
-    try {
-      // AQUÍ SE CONECTA A LA API (Necesitas tu API Key gratuita)
-      // const response = await fetch('https://api.football-data.org/v4/competitions/WC/matches?status=SCHEDULED,IN_PLAY,FINISHED', {
-      //   headers: { 'X-Auth-Token': 'TU_API_KEY_AQUI' }
-      // });
-      // const data = await response.json();
-      // setMatches(data.matches);
-      
-      // RESPALDO: Mientras pones tu llave de API, el sistema usará estos datos. 
-      // Si actualizas los marcadores aquí y haces git push, se reflejará al instante.
-      const fallbackMatches = [
-        { id: 101, home_team: 'Suiza', away_team: 'Canadá', home_flag: 'https://flagcdn.com/w80/ch.png', away_flag: 'https://flagcdn.com/w80/ca.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-        { id: 102, home_team: 'Bosnia', away_team: 'Catar', home_flag: 'https://flagcdn.com/w80/ba.png', away_flag: 'https://flagcdn.com/w80/qa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-        { id: 103, home_team: 'Marruecos', away_team: 'Haití', home_flag: 'https://flagcdn.com/w80/ma.png', away_flag: 'https://flagcdn.com/w80/ht.png', home_score: 0, away_score: 0, status: 'PENDING', time: '18:00' },
-        { id: 104, home_team: 'Escocia', away_team: 'Brasil', home_flag: 'https://flagcdn.com/w80/gb-sct.png', away_flag: 'https://flagcdn.com/w80/br.png', home_score: 0, away_score: 0, status: 'PENDING', time: '18:00' },
-        { id: 105, home_team: 'Sudáfrica', away_team: 'Corea Sur', home_flag: 'https://flagcdn.com/w80/za.png', away_flag: 'https://flagcdn.com/w80/kr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '21:00' },
-        { id: 106, home_team: 'R. Checa', away_team: 'México', home_flag: 'https://flagcdn.com/w80/cz.png', away_flag: 'https://flagcdn.com/w80/mx.png', home_score: 0, away_score: 0, status: 'PENDING', time: '21:00' }
-      ];
-      setMatches(fallbackMatches);
-    } catch (error) {
-      console.error("Error conectando a la API", error);
-    }
-  };
-
   const fetchPredictions = async () => {
-    const { data } = await supabase.from('predictions').select('*');
+    const { data, error } = await supabase.from('predictions').select('*');
+    if (error) console.error("Error al leer:", error);
     if (data) setPredictions(data);
   };
 
@@ -75,44 +61,46 @@ export default function App() {
     e.preventDefault();
     if (!nameInput) return;
     const formattedName = nameInput.trim();
+    
+    // Guardar en Supabase para tener la lista de jugadores activos
     await supabase.from('users').upsert({ name: formattedName });
-    localStorage.setItem('pollaUser', formattedName);
+    
+    // Guardar en el celular amarrado a la fecha de hoy
+    localStorage.setItem('pollaData', JSON.stringify({ nombre: formattedName, fecha: hoyStr }));
     setUser(formattedName);
   };
 
   const predict = async (matchId, home, away) => {
-    await supabase.from('predictions').upsert({
-      user_name: user,
-      match_id: matchId,
-      home_score: parseInt(home),
-      away_score: parseInt(away)
+    const { error } = await supabase.from('predictions').upsert({
+      user_name: user, match_id: matchId, home_score: parseInt(home), away_score: parseInt(away)
     }, { onConflict: 'user_name, match_id' });
-    fetchPredictions();
-    alert('Apuesta guardada. ¡Mucha suerte!');
+    
+    if (error) alert("Hubo un error al guardar. Revisa tu internet.");
+    else fetchPredictions();
   };
 
-  // Función que verifica si faltan 5 minutos o menos para el partido
   const isLocked = (matchTimeStr) => {
     const [hours, minutes] = matchTimeStr.split(':');
     const matchDate = new Date();
     matchDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
-    
-    // Diferencia en minutos
     const diffMinutes = (matchDate.getTime() - currentTime.getTime()) / 60000;
-    return diffMinutes <= 5;
+    return diffMinutes <= 5; // Se bloquea 5 minutos antes
   };
 
-  // CÁLCULO DE POZO Y ACUMULADOS
-  const totalJugadores = new Set(predictions.map(p => p.user_name)).size;
-  let acumulado = 0; // El pozo que se arrastra si nadie gana
+  // CÁLCULO ESTRICTO DE POZOS
+  // 1. Contamos cuántos familiares ÚNICOS han apostado en al menos un partido hoy
+  const jugadoresUnicosHoy = new Set(predictions.map(p => p.user_name)).size;
+  
+  // 2. Calculamos los acumulados
+  let acumuladoEnJuego = POZO_AYER; 
 
   const matchesConPozo = matches.map(m => {
     const matchPreds = predictions.filter(p => p.match_id === m.id);
     const ganadores = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
     
-    // El pozo de ESTE partido es lo que puso la gente hoy + lo que sobró de partidos anteriores
-    const pozoBaseDelPartido = totalJugadores * PRECIO_POR_PARTIDO;
-    const pozoTotal = pozoBaseDelPartido + acumulado;
+    // Lo que se junta en ESTE partido es la cantidad de jugadores x 3 Bs
+    const pozoBaseDelPartido = jugadoresUnicosHoy * PRECIO_POR_PARTIDO;
+    const pozoTotal = pozoBaseDelPartido + acumuladoEnJuego;
     
     let mensajeResultado = "";
     
@@ -120,10 +108,10 @@ export default function App() {
       if (ganadores.length > 0) {
         const premio = (pozoTotal / ganadores.length).toFixed(2);
         mensajeResultado = `Ganador(es): ${ganadores.map(g => g.user_name).join(', ')} (Premio: ${premio} Bs)`;
-        acumulado = 0; // El pozo se vacía porque alguien lo ganó
+        acumuladoEnJuego = 0; 
       } else {
         mensajeResultado = "Nadie acertó. El pozo se acumula.";
-        acumulado = pozoTotal; // Pasa todo el dinero al siguiente partido
+        acumuladoEnJuego = pozoTotal; 
       }
     }
 
@@ -135,11 +123,11 @@ export default function App() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <form onSubmit={login} className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm">
           <div className="text-center mb-6">
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight">Mundial Vargas</h1>
-            <p className="text-slate-500 text-sm mt-2">Ingresa tu nombre para apostar en los 6 partidos del día.</p>
+            <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase">Mundial Vargas</h1>
+            <p className="text-slate-500 text-sm mt-2">Nuevo día, nuevas apuestas. Costo: 18 Bs (3 Bs x 6 partidos).</p>
           </div>
           <input 
-            type="text" placeholder="Tu nombre..." required
+            type="text" placeholder="Ingresa tu nombre..." required
             className="w-full bg-slate-100 text-slate-900 px-5 py-4 rounded-xl mb-4 outline-none border border-slate-300 focus:border-blue-500 font-bold text-center"
             value={nameInput} onChange={(e) => setNameInput(e.target.value)}
           />
@@ -151,8 +139,8 @@ export default function App() {
     );
   }
 
-  // El gran total que vería el cobrador para el día de hoy
-  const recaudacionTotalDelDia = totalJugadores * (PRECIO_POR_PARTIDO * matches.length);
+  // La plata física que debe tener el cobrador hoy
+  const recaudacionTotalDelDia = jugadoresUnicosHoy * (PRECIO_POR_PARTIDO * matches.length);
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-10">
@@ -160,10 +148,10 @@ export default function App() {
       <header className="bg-white sticky top-0 z-50 p-4 border-b border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="text-center md:text-left">
           <h1 className="text-2xl font-black text-slate-900 uppercase">Mundial Vargas</h1>
-          <p className="text-sm text-slate-500 mt-1">Jugador activo: <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{user}</span></p>
+          <p className="text-sm text-slate-500 mt-1">Jugador: <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{user}</span> | Jugadores Activos: {jugadoresUnicosHoy}</p>
         </div>
         <div className="bg-slate-100 px-6 py-2 rounded-2xl border border-slate-200 text-center w-full md:w-auto">
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Recaudación Total Hoy</p>
+          <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Recaudación (A cobrar hoy)</p>
           <p className="text-2xl font-black text-slate-800">{recaudacionTotalDelDia} <span className="text-base">Bs</span></p>
         </div>
       </header>
@@ -184,9 +172,8 @@ export default function App() {
                   Hora: {m.time}
                 </div>
                 
-                {/* ETIQUETAS DE ESTADO DEL PARTIDO */}
                 {isFinished && <div className="absolute top-0 left-0 bg-slate-800 text-white text-[10px] font-bold px-4 py-1.5 rounded-br-xl uppercase tracking-widest">Finalizado</div>}
-                {locked && <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-br-xl uppercase tracking-widest animate-pulse">Apuestas Cerradas</div>}
+                {locked && <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-br-xl uppercase tracking-widest animate-pulse">Cerrado</div>}
 
                 <div className="flex justify-between items-center mt-6 mb-4">
                   <div className="flex flex-col items-center w-1/3">
@@ -204,7 +191,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* INFO DEL POZO Y GANADORES */}
                 <div className="text-center mb-6">
                   <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
                     Pozo en juego: {m.pozoTotal} Bs
@@ -216,7 +202,6 @@ export default function App() {
                   )}
                 </div>
 
-                {/* FORMULARIO O ESTADO DE PREDICCIÓN */}
                 {!isFinished && !locked ? (
                   <form 
                     onSubmit={(e) => { e.preventDefault(); predict(m.id, e.target.home.value, e.target.away.value); }}
@@ -235,7 +220,6 @@ export default function App() {
                   </div>
                 )}
 
-                {/* TABLA DE PREDICCIONES DEL PARTIDO */}
                 <div className="mt-auto border-t border-slate-100 pt-4">
                   <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Apuestas registradas</h3>
                   {matchPredictions.length > 0 ? (
@@ -258,7 +242,7 @@ export default function App() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400 italic text-center py-2">Aún no hay apuestas.</p>
+                    <p className="text-xs text-slate-400 italic text-center py-2">Nadie apostó aún.</p>
                   )}
                 </div>
 
