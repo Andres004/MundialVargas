@@ -69,14 +69,21 @@ export default function App() {
     localStorage.setItem('pollaData', JSON.stringify({ nombre: formattedName, fecha: hoyStr }));
     setUser(formattedName);
   };
-
-  const predict = async (matchId, home, away) => {
+const predict = async (matchId, home, away) => {
     const { error } = await supabase.from('predictions').upsert({
-      user_name: user, match_id: matchId, home_score: parseInt(home), away_score: parseInt(away)
-    }, { onConflict: 'user_name, match_id' });
+      user_name: user, 
+      match_id: matchId, 
+      home_score: parseInt(home) || 0, 
+      away_score: parseInt(away) || 0
+    }, { onConflict: 'user_name,match_id' }); // <-- Le quitamos un espacio problemático aquí
     
-    if (error) alert("Hubo un error al guardar. Revisa tu internet.");
-    else fetchPredictions();
+    if (error) {
+      // Ahora nos dirá EXACTAMENTE qué le molesta a la base de datos
+      alert("Error de Supabase: " + error.message); 
+    } else {
+      fetchPredictions();
+      alert("¡Apuesta guardada!");
+    }
   };
 
   const isLocked = (matchTimeStr) => {
