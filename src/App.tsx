@@ -8,12 +8,14 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // ⚙️ CONFIGURACIÓN DEL ADMINISTRADOR (TÚ)
 // =========================================================================
 
-// 1. El sobrante exacto de los partidos de hoy (según el cálculo de tu tabla).
+// 1. FECHA EXACTA DE LOS PARTIDOS (Formato: AÑO-MES-DIA). 
+const FECHA_DE_PARTIDOS = "2026-06-25";
+
+// 2. El sobrante exacto de los partidos anteriores
 const POZO_AYER = 115.5; 
 const PRECIO_POR_PARTIDO = 3; 
 
-// 2. PARTIDOS REALES DEL JUEVES 25 DE JUNIO (Con horarios de Bolivia)
-// OJO: Los IDs ahora son 201+ para que no se mezclen con las apuestas de ayer en la base de datos.
+// 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
 const PARTIDOS_DE_HOY = [
   { id: 201, home_team: 'Ecuador', away_team: 'Alemania', home_flag: 'https://flagcdn.com/w80/ec.png', away_flag: 'https://flagcdn.com/w80/de.png', home_score: 0, away_score: 0, status: 'PENDING', time: '16:00' },
   { id: 202, home_team: 'Curazao', away_team: 'C. Marfil', home_flag: 'https://flagcdn.com/w80/cw.png', away_flag: 'https://flagcdn.com/w80/ci.png', home_score: 0, away_score: 0, status: 'PENDING', time: '16:00' },
@@ -24,9 +26,10 @@ const PARTIDOS_DE_HOY = [
 ];
 
 export default function App() {
-  const hoyStr = new Date().toLocaleDateString('es-BO');
+  const hoyStr = FECHA_DE_PARTIDOS; 
   const datosGuardados = JSON.parse(localStorage.getItem('pollaData') || '{}');
   
+  // Si la fecha guardada en el celular no coincide con FECHA_DE_PARTIDOS, pedirá el nombre de nuevo
   const [user, setUser] = useState(datosGuardados.fecha === hoyStr ? datosGuardados.nombre : '');
   const [nameInput, setNameInput] = useState('');
   
@@ -83,16 +86,21 @@ export default function App() {
   };
 
   const isLocked = (matchTimeStr) => {
+    const [year, month, day] = FECHA_DE_PARTIDOS.split('-');
     const [hours, minutes] = matchTimeStr.split(':');
-    const matchDate = new Date();
-    matchDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+    
+    const matchDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0, 0);
+    
     const diffMinutes = (matchDate.getTime() - currentTime.getTime()) / 60000;
-    // BLOQUEO EXACTO A LOS 30 MINUTOS ANTES
-    return diffMinutes <= 30; 
+    return diffMinutes <= 30; // Bloqueo 30 minutos antes
   };
 
-  // CÁLCULO ESTRICTO DE POZOS DIVISIBLES (Exactamente como tu Excel)
-  const jugadoresUnicosSet = new Set(predictions.map(p => p.user_name));
+  // 1. FILTRAMOS SOLO LAS APUESTAS DE HOY (IDs 201 en adelante)
+  const idsDeHoy = matches.map(m => m.id);
+  const prediccionesDeHoy = predictions.filter(p => idsDeHoy.includes(p.match_id));
+  
+  // 2. CONTAMOS SOLO A LOS JUGADORES QUE HAN APOSTADO HOY
+  const jugadoresUnicosSet = new Set(prediccionesDeHoy.map(p => p.user_name));
   const jugadoresUnicosHoy = jugadoresUnicosSet.size;
   
   let acumuladoEnJuego = POZO_AYER; 
@@ -113,7 +121,7 @@ export default function App() {
     let acumuladoParaSiguienteHora = 0;
 
     grupo.forEach(m => {
-      const matchPreds = predictions.filter(p => p.match_id === m.id);
+      const matchPreds = prediccionesDeHoy.filter(p => p.match_id === m.id);
       const ganadores = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
       
       const pozoBaseDelPartido = jugadoresUnicosHoy * PRECIO_POR_PARTIDO;
@@ -124,10 +132,9 @@ export default function App() {
       if (m.status === 'FINISHED') {
         if (ganadores.length > 0) {
           const premio = (pozoTotal / ganadores.length).toFixed(2);
-          mensajeResultado = `🏆 GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
+          mensajeResultado = `GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
         } else {
           mensajeResultado = "Nadie acertó. El pozo pasa al siguiente turno.";
-          // Sumamos la sobra para la siguiente hora
           acumuladoParaSiguienteHora += pozoTotal; 
         }
       }
@@ -135,7 +142,6 @@ export default function App() {
       matchesConPozoUnsorted.push({ ...m, pozoTotal, mensajeResultado, ganadores });
     });
 
-    // Actualizamos el pozo global para la siguiente franja horaria
     acumuladoEnJuego = acumuladoParaSiguienteHora;
   });
 
@@ -172,7 +178,7 @@ export default function App() {
       <header className="bg-white sticky top-0 z-50 p-5 border-b border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="text-center md:text-left">
           <h1 className="text-2xl md:text-3xl font-black text-indigo-950 uppercase tracking-tight">Mundial Vargas</h1>
-          <p className="text-sm text-slate-500 mt-1 font-bold">Jugador: <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">{user}</span> | Activos: {jugadoresUnicosHoy}</p>
+          <p className="text-sm text-slate-500 mt-1 font-bold">Jugador: <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">{user}</span> | Activos Hoy: {jugadoresUnicosHoy}</p>
         </div>
         <div className="bg-indigo-50 px-6 py-2.5 rounded-2xl border border-indigo-100 text-center w-full md:w-auto shadow-inner">
           <p className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">Recaudación de Hoy</p>
@@ -183,10 +189,10 @@ export default function App() {
       <div className="max-w-6xl mx-auto px-4 mt-10">
         <div className="grid gap-8 md:grid-cols-2">
           {matchesConPozo.map(m => {
-            const myP = predictions.find(p => p.match_id === m.id && p.user_name === user);
+            const myP = prediccionesDeHoy.find(p => p.match_id === m.id && p.user_name === user);
             const isFinished = m.status === 'FINISHED';
             const locked = isLocked(m.time) || isFinished;
-            const matchPredictions = predictions.filter(p => p.match_id === m.id);
+            const matchPredictions = prediccionesDeHoy.filter(p => p.match_id === m.id);
             
             return (
               <div key={m.id} className="bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100 shadow-lg relative flex flex-col hover:shadow-xl transition-shadow">
@@ -267,7 +273,7 @@ export default function App() {
                     )
                   ) : (
                     <div className="bg-amber-50 border border-amber-100 text-amber-600 text-[11px] font-black text-center py-3 rounded-xl uppercase tracking-widest">
-                      🔒 Secretas hasta el cierre
+                      [ OCULTAS HASTA EL CIERRE ]
                     </div>
                   )}
                 </div>
@@ -300,7 +306,7 @@ export default function App() {
                   <tr key={jugador} className="hover:bg-slate-50 transition-colors">
                     <td className="p-4 font-black text-left text-slate-700 border-r border-slate-200">{jugador}</td>
                     {matchesConPozo.map(m => {
-                      const p = predictions.find(pred => pred.match_id === m.id && pred.user_name === jugador);
+                      const p = prediccionesDeHoy.find(pred => pred.match_id === m.id && pred.user_name === jugador);
                       let content = "-";
                       let bgClass = "";
                       
@@ -316,7 +322,7 @@ export default function App() {
                             }
                           }
                         } else {
-                          content = "🔒";
+                          content = "SECRETO";
                         }
                       }
 
