@@ -44,6 +44,7 @@ export default function App() {
       const channel = supabase
         .channel('public-changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'predictions' }, () => {
+          // Esto descarga las apuestas de los demás en tiempo real sin que refresques
           fetchPredictions();
         })
         .subscribe();
@@ -68,19 +69,36 @@ export default function App() {
     setUser(formattedName);
   };
 
+  // ⚡ NUEVO PREDICT: Instantáneo, sin alertas y con autoguardado
   const predict = async (matchId, home, away) => {
+    // Permitimos campos vacíos temporalmente mientras teclean
+    const homeVal = home === '' ? '' : parseInt(home) || 0;
+    const awayVal = away === '' ? '' : parseInt(away) || 0;
+
+    // ACTUALIZACIÓN INSTANTÁNEA EN PANTALLA (Para que no sientan lag al teclear)
+    setPredictions(prev => {
+      const newList = [...prev];
+      const index = newList.findIndex(p => p.match_id === matchId && p.user_name === user);
+      if (index >= 0) {
+        newList[index] = { ...newList[index], home_score: homeVal, away_score: awayVal };
+      } else {
+        newList.push({ user_name: user, match_id: matchId, home_score: homeVal, away_score: awayVal });
+      }
+      return newList;
+    });
+
+    // GUARDADO SILENCIOSO EN BASE DE DATOS
     const { error } = await supabase.from('predictions').upsert({
       user_name: user, 
       match_id: matchId, 
-      home_score: parseInt(home) || 0, 
-      away_score: parseInt(away) || 0
+      home_score: homeVal === '' ? 0 : homeVal, // Si lo borran, asume 0 en BD
+      away_score: awayVal === '' ? 0 : awayVal
     }, { onConflict: 'user_name,match_id' });
     
     if (error) {
-      alert("Error de Supabase: " + error.message); 
-    } else {
-      fetchPredictions();
-      alert("¡Apuesta guardada!");
+      console.error("Error al guardar: " + error.message); 
+      // Si falla tu internet, recarga los datos reales
+      fetchPredictions(); 
     }
   };
 
@@ -91,7 +109,7 @@ export default function App() {
     const matchDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0, 0);
     
     const diffMinutes = (matchDate.getTime() - currentTime.getTime()) / 60000;
-    return diffMinutes <= 30; // Bloqueo 30 minutos antes
+    return diffMinutes <= 30; 
   };
 
   const idsDeHoy = matches.map(m => m.id);
@@ -227,17 +245,32 @@ export default function App() {
                   )}
                 </div>
 
+                {/* ⚡ NUEVA ZONA DE APUESTAS: Sin botón, autoguardado */}
                 {!locked ? (
-                  <form 
-                    onSubmit={(e) => { e.preventDefault(); predict(m.id, e.target.home.value, e.target.away.value); }}
-                    className="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-200 mb-6 shadow-inner"
-                  >
-                    <input type="number" name="home" min="0" required defaultValue={myP?.home_score} className="w-16 h-12 bg-white border-2 border-slate-200 rounded-xl text-center text-xl font-black text-indigo-950 outline-none focus:border-indigo-500" />
-                    <button type="submit" className="bg-indigo-600 text-white font-black px-8 py-3 rounded-xl text-xs hover:bg-indigo-700 shadow-lg shadow-indigo-600/30 uppercase tracking-widest transition-transform active:scale-95">
-                      {myP ? 'Modificar' : 'Apostar'}
-                    </button>
-                    <input type="number" name="away" min="0" required defaultValue={myP?.away_score} className="w-16 h-12 bg-white border-2 border-slate-200 rounded-xl text-center text-xl font-black text-indigo-950 outline-none focus:border-indigo-500" />
-                  </form>
+                  <div className="mb-6">
+                    <div className="bg-slate-50 p-4 rounded-2xl flex justify-center items-center gap-6 border border-slate-200 shadow-inner">
+                      <input 
+                        type="number" 
+                        min="0" 
+                        value={myP && myP.home_score !== '' ? myP.home_score : ''} 
+                        onChange={(e) => predict(m.id, e.target.value, myP?.away_score ?? '')} 
+                        className="w-20 h-14 bg-white border-2 border-slate-200 rounded-xl text-center text-2xl font-black text-indigo-950 outline-none focus:border-indigo-500 transition-all" 
+                        placeholder="-"
+                      />
+                      <span className="text-xl font-black text-slate-300">:</span>
+                      <input 
+                        type="number" 
+                        min="0" 
+                        value={myP && myP.away_score !== '' ? myP.away_score : ''} 
+                        onChange={(e) => predict(m.id, myP?.home_score ?? '', e.target.value)} 
+                        className="w-20 h-14 bg-white border-2 border-slate-200 rounded-xl text-center text-2xl font-black text-indigo-950 outline-none focus:border-indigo-500 transition-all" 
+                        placeholder="-"
+                      />
+                    </div>
+                    <p className="text-[10px] text-center text-indigo-400 font-bold mt-2 uppercase tracking-widest animate-pulse">
+                      Se guarda automáticamente ☁️
+                    </p>
+                  </div>
                 ) : (
                   <div className="bg-slate-50 p-4 rounded-2xl text-center border border-slate-200 mb-6">
                     <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">Tu predicción</p>
@@ -245,7 +278,6 @@ export default function App() {
                   </div>
                 )}
 
-                {/* LISTA DE APUESTAS (Con efecto borroso si está abierto) */}
                 <div className="mt-auto border-t border-slate-100 pt-5">
                   <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Apuestas de la Familia</h3>
                   {matchPredictions.length > 0 ? (
@@ -324,7 +356,7 @@ export default function App() {
                             }
                           }
                         } else {
-                          // Efecto borroso para apuestas secretas en la tabla
+                          // Efecto borroso en tabla general para proteger secretos
                           content = <span className="blur-sm opacity-40 select-none text-slate-500">0 - 0</span>;
                         }
                       }
