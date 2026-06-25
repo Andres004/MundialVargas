@@ -8,26 +8,25 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // ⚙️ CONFIGURACIÓN DEL ADMINISTRADOR (TÚ)
 // =========================================================================
 
-// 1. Si ayer sobró plata porque nadie acertó, ponla aquí (ej: 15). Si no, déjalo en 0.
-const POZO_AYER = 0; 
+// 1. El sobrante exacto de los partidos de hoy (según el cálculo de tu tabla).
+const POZO_AYER = 115.5; 
 const PRECIO_POR_PARTIDO = 3; 
 
-// 2. TÚ ERES LA API: Modifica aquí los marcadores cuando acaben los partidos reales 
-// y cambia el status de 'PENDING' a 'FINISHED'. Luego haces git push.
+// 2. PARTIDOS REALES DEL JUEVES 25 DE JUNIO (Con horarios de Bolivia)
+// OJO: Los IDs ahora son 201+ para que no se mezclen con las apuestas de ayer en la base de datos.
 const PARTIDOS_DE_HOY = [
-  { id: 101, home_team: 'Suiza', away_team: 'Canadá', home_flag: 'https://flagcdn.com/w80/ch.png', away_flag: 'https://flagcdn.com/w80/ca.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-  { id: 102, home_team: 'Bosnia', away_team: 'Catar', home_flag: 'https://flagcdn.com/w80/ba.png', away_flag: 'https://flagcdn.com/w80/qa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-  { id: 103, home_team: 'Marruecos', away_team: 'Haití', home_flag: 'https://flagcdn.com/w80/ma.png', away_flag: 'https://flagcdn.com/w80/ht.png', home_score: 0, away_score: 0, status: 'PENDING', time: '18:00' },
-  { id: 104, home_team: 'Escocia', away_team: 'Brasil', home_flag: 'https://flagcdn.com/w80/gb-sct.png', away_flag: 'https://flagcdn.com/w80/br.png', home_score: 0, away_score: 0, status: 'PENDING', time: '18:00' },
-  { id: 105, home_team: 'Sudáfrica', away_team: 'Corea Sur', home_flag: 'https://flagcdn.com/w80/za.png', away_flag: 'https://flagcdn.com/w80/kr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '21:00' },
-  { id: 106, home_team: 'R. Checa', away_team: 'México', home_flag: 'https://flagcdn.com/w80/cz.png', away_flag: 'https://flagcdn.com/w80/mx.png', home_score: 0, away_score: 0, status: 'PENDING', time: '21:00' }
+  { id: 201, home_team: 'Ecuador', away_team: 'Alemania', home_flag: 'https://flagcdn.com/w80/ec.png', away_flag: 'https://flagcdn.com/w80/de.png', home_score: 0, away_score: 0, status: 'PENDING', time: '16:00' },
+  { id: 202, home_team: 'Curazao', away_team: 'C. Marfil', home_flag: 'https://flagcdn.com/w80/cw.png', away_flag: 'https://flagcdn.com/w80/ci.png', home_score: 0, away_score: 0, status: 'PENDING', time: '16:00' },
+  { id: 203, home_team: 'Japón', away_team: 'Suecia', home_flag: 'https://flagcdn.com/w80/jp.png', away_flag: 'https://flagcdn.com/w80/se.png', home_score: 0, away_score: 0, status: 'PENDING', time: '19:00' },
+  { id: 204, home_team: 'Países Bajos', away_team: 'Túnez', home_flag: 'https://flagcdn.com/w80/nl.png', away_flag: 'https://flagcdn.com/w80/tn.png', home_score: 0, away_score: 0, status: 'PENDING', time: '19:00' },
+  { id: 205, home_team: 'EE.UU.', away_team: 'Turquía', home_flag: 'https://flagcdn.com/w80/us.png', away_flag: 'https://flagcdn.com/w80/tr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '22:00' },
+  { id: 206, home_team: 'Paraguay', away_team: 'Australia', home_flag: 'https://flagcdn.com/w80/py.png', away_flag: 'https://flagcdn.com/w80/au.png', home_score: 0, away_score: 0, status: 'PENDING', time: '22:00' }
 ];
 
 export default function App() {
-  const hoyStr = new Date().toLocaleDateString('es-BO'); // Ej: "24/6/2026"
+  const hoyStr = new Date().toLocaleDateString('es-BO');
   const datosGuardados = JSON.parse(localStorage.getItem('pollaData') || '{}');
   
-  // Si la fecha guardada no es de hoy, obliga a poner el nombre de nuevo
   const [user, setUser] = useState(datosGuardados.fecha === hoyStr ? datosGuardados.nombre : '');
   const [nameInput, setNameInput] = useState('');
   
@@ -62,23 +61,20 @@ export default function App() {
     if (!nameInput) return;
     const formattedName = nameInput.trim();
     
-    // Guardar en Supabase para tener la lista de jugadores activos
     await supabase.from('users').upsert({ name: formattedName });
-    
-    // Guardar en el celular amarrado a la fecha de hoy
     localStorage.setItem('pollaData', JSON.stringify({ nombre: formattedName, fecha: hoyStr }));
     setUser(formattedName);
   };
-const predict = async (matchId, home, away) => {
+
+  const predict = async (matchId, home, away) => {
     const { error } = await supabase.from('predictions').upsert({
       user_name: user, 
       match_id: matchId, 
       home_score: parseInt(home) || 0, 
       away_score: parseInt(away) || 0
-    }, { onConflict: 'user_name,match_id' }); // <-- Le quitamos un espacio problemático aquí
+    }, { onConflict: 'user_name,match_id' });
     
     if (error) {
-      // Ahora nos dirá EXACTAMENTE qué le molesta a la base de datos
       alert("Error de Supabase: " + error.message); 
     } else {
       fetchPredictions();
@@ -91,165 +87,188 @@ const predict = async (matchId, home, away) => {
     const matchDate = new Date();
     matchDate.setHours(parseInt(hours), parseInt(minutes), 0, 0);
     const diffMinutes = (matchDate.getTime() - currentTime.getTime()) / 60000;
-    return diffMinutes <= 5; // Se bloquea 5 minutos antes
+    // BLOQUEO EXACTO A LOS 30 MINUTOS ANTES
+    return diffMinutes <= 30; 
   };
 
-  // CÁLCULO ESTRICTO DE POZOS
-  // 1. Contamos cuántos familiares ÚNICOS han apostado en al menos un partido hoy
-  const jugadoresUnicosHoy = new Set(predictions.map(p => p.user_name)).size;
+  // CÁLCULO ESTRICTO DE POZOS DIVISIBLES (Exactamente como tu Excel)
+  const jugadoresUnicosSet = new Set(predictions.map(p => p.user_name));
+  const jugadoresUnicosHoy = jugadoresUnicosSet.size;
   
-  // 2. Calculamos los acumulados
   let acumuladoEnJuego = POZO_AYER; 
 
-  const matchesConPozo = matches.map(m => {
-    const matchPreds = predictions.filter(p => p.match_id === m.id);
-    const ganadores = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
-    
-    // Lo que se junta en ESTE partido es la cantidad de jugadores x 3 Bs
-    const pozoBaseDelPartido = jugadoresUnicosHoy * PRECIO_POR_PARTIDO;
-    const pozoTotal = pozoBaseDelPartido + acumuladoEnJuego;
-    
-    let mensajeResultado = "";
-    
-    if (m.status === 'FINISHED') {
-      if (ganadores.length > 0) {
-        const premio = (pozoTotal / ganadores.length).toFixed(2);
-        mensajeResultado = `Ganador(es): ${ganadores.map(g => g.user_name).join(', ')} (Premio: ${premio} Bs)`;
-        acumuladoEnJuego = 0; 
-      } else {
-        mensajeResultado = "Nadie acertó. El pozo se acumula.";
-        acumuladoEnJuego = pozoTotal; 
-      }
-    }
-
-    return { ...m, pozoTotal, mensajeResultado, ganadores };
+  const partidosPorHora = {};
+  matches.forEach(m => {
+    if (!partidosPorHora[m.time]) partidosPorHora[m.time] = [];
+    partidosPorHora[m.time].push(m);
   });
+
+  const horasOrdenadas = Object.keys(partidosPorHora).sort();
+  const matchesConPozoUnsorted = [];
+
+  horasOrdenadas.forEach(hora => {
+    const grupo = partidosPorHora[hora];
+    // Se divide el pozo acumulado entre los partidos de la misma hora
+    const acumuladoRepartido = acumuladoEnJuego / grupo.length;
+    let acumuladoParaSiguienteHora = 0;
+
+    grupo.forEach(m => {
+      const matchPreds = predictions.filter(p => p.match_id === m.id);
+      const ganadores = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
+      
+      const pozoBaseDelPartido = jugadoresUnicosHoy * PRECIO_POR_PARTIDO;
+      const pozoTotal = pozoBaseDelPartido + acumuladoRepartido;
+      
+      let mensajeResultado = "";
+      
+      if (m.status === 'FINISHED') {
+        if (ganadores.length > 0) {
+          const premio = (pozoTotal / ganadores.length).toFixed(2);
+          mensajeResultado = `🏆 GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
+        } else {
+          mensajeResultado = "Nadie acertó. El pozo pasa al siguiente turno.";
+          // Sumamos la sobra para la siguiente hora
+          acumuladoParaSiguienteHora += pozoTotal; 
+        }
+      }
+
+      matchesConPozoUnsorted.push({ ...m, pozoTotal, mensajeResultado, ganadores });
+    });
+
+    // Actualizamos el pozo global para la siguiente franja horaria
+    acumuladoEnJuego = acumuladoParaSiguienteHora;
+  });
+
+  const matchesConPozo = matchesConPozoUnsorted.sort((a,b) => a.id - b.id);
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <form onSubmit={login} className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-slate-200 w-full max-w-sm">
-          <div className="text-center mb-6">
-            <h1 className="text-3xl font-black text-slate-800 tracking-tight uppercase">Mundial Vargas</h1>
-            <p className="text-slate-500 text-sm mt-2">Nuevo día, nuevas apuestas. Costo: 18 Bs (3 Bs x 6 partidos).</p>
+      <div className="min-h-screen bg-[#f3f4f6] flex items-center justify-center p-4" style={{ fontFamily: "'Outfit', sans-serif" }}>
+        <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');`}</style>
+        <form onSubmit={login} className="bg-white p-8 md:p-10 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-sm">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-black text-indigo-900 tracking-tight uppercase">Mundial Vargas</h1>
+            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: 18 Bs (3 Bs x 6 partidos).</p>
           </div>
           <input 
             type="text" placeholder="Ingresa tu nombre..." required
-            className="w-full bg-slate-100 text-slate-900 px-5 py-4 rounded-xl mb-4 outline-none border border-slate-300 focus:border-blue-500 font-bold text-center"
+            className="w-full bg-slate-50 text-slate-900 px-5 py-4 rounded-2xl mb-6 outline-none border-2 border-slate-200 focus:border-indigo-500 font-bold text-center text-lg transition-all"
             value={nameInput} onChange={(e) => setNameInput(e.target.value)}
           />
-          <button type="submit" className="w-full bg-blue-600 text-white font-black py-4 rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30 uppercase tracking-widest">
-            Entrar
+          <button type="submit" className="w-full bg-indigo-600 text-white font-black py-4 rounded-2xl hover:bg-indigo-700 hover:shadow-xl transition-all uppercase tracking-widest text-lg">
+            Entrar a Jugar
           </button>
         </form>
       </div>
     );
   }
 
-  // La plata física que debe tener el cobrador hoy
   const recaudacionTotalDelDia = jugadoresUnicosHoy * (PRECIO_POR_PARTIDO * matches.length);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans pb-10">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-12" style={{ fontFamily: "'Outfit', sans-serif" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');`}</style>
       
-      <header className="bg-white sticky top-0 z-50 p-4 border-b border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
+      <header className="bg-white sticky top-0 z-50 p-5 border-b border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="text-center md:text-left">
-          <h1 className="text-2xl font-black text-slate-900 uppercase">Mundial Vargas</h1>
-          <p className="text-sm text-slate-500 mt-1">Jugador: <span className="font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{user}</span> | Jugadores Activos: {jugadoresUnicosHoy}</p>
+          <h1 className="text-2xl md:text-3xl font-black text-indigo-950 uppercase tracking-tight">Mundial Vargas</h1>
+          <p className="text-sm text-slate-500 mt-1 font-bold">Jugador: <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">{user}</span> | Activos: {jugadoresUnicosHoy}</p>
         </div>
-        <div className="bg-slate-100 px-6 py-2 rounded-2xl border border-slate-200 text-center w-full md:w-auto">
-          <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Recaudación (A cobrar hoy)</p>
-          <p className="text-2xl font-black text-slate-800">{recaudacionTotalDelDia} <span className="text-base">Bs</span></p>
+        <div className="bg-indigo-50 px-6 py-2.5 rounded-2xl border border-indigo-100 text-center w-full md:w-auto shadow-inner">
+          <p className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">Recaudación de Hoy</p>
+          <p className="text-3xl font-black text-indigo-700">{recaudacionTotalDelDia} <span className="text-base">Bs</span></p>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 mt-8">
-        <h2 className="text-lg font-black text-slate-800 mb-6 border-l-4 border-blue-600 pl-3 uppercase tracking-widest">Partidos y Predicciones</h2>
-        
+      <div className="max-w-6xl mx-auto px-4 mt-10">
         <div className="grid gap-8 md:grid-cols-2">
           {matchesConPozo.map(m => {
             const myP = predictions.find(p => p.match_id === m.id && p.user_name === user);
             const isFinished = m.status === 'FINISHED';
-            const locked = isLocked(m.time) && !isFinished;
+            const locked = isLocked(m.time) || isFinished;
             const matchPredictions = predictions.filter(p => p.match_id === m.id);
             
             return (
-              <div key={m.id} className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm relative flex flex-col">
-                <div className="absolute top-0 right-0 bg-slate-100 text-slate-500 text-[10px] font-bold px-4 py-1.5 rounded-bl-xl border-b border-l border-slate-200 uppercase tracking-widest">
+              <div key={m.id} className="bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100 shadow-lg relative flex flex-col hover:shadow-xl transition-shadow">
+                
+                <div className="absolute top-0 right-0 bg-slate-100 text-slate-600 text-[11px] font-black px-5 py-2 rounded-bl-2xl border-b border-l border-slate-200 uppercase tracking-widest">
                   Hora: {m.time}
                 </div>
                 
-                {isFinished && <div className="absolute top-0 left-0 bg-slate-800 text-white text-[10px] font-bold px-4 py-1.5 rounded-br-xl uppercase tracking-widest">Finalizado</div>}
-                {locked && <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-4 py-1.5 rounded-br-xl uppercase tracking-widest animate-pulse">Cerrado</div>}
+                {isFinished && <div className="absolute top-0 left-0 bg-indigo-950 text-white text-[11px] font-black px-5 py-2 rounded-br-2xl uppercase tracking-widest">Finalizado</div>}
+                {locked && !isFinished && <div className="absolute top-0 left-0 bg-red-500 text-white text-[11px] font-black px-5 py-2 rounded-br-2xl uppercase tracking-widest shadow-md">Cerrado</div>}
 
-                <div className="flex justify-between items-center mt-6 mb-4">
+                <div className="flex justify-between items-center mt-8 mb-6">
                   <div className="flex flex-col items-center w-1/3">
-                    <img src={m.home_flag} alt={m.home_team} className="w-16 h-12 object-cover rounded shadow-sm mb-3 border border-slate-200" />
-                    <span className="font-bold text-sm text-slate-700 text-center uppercase tracking-wide">{m.home_team}</span>
+                    <img src={m.home_flag} alt={m.home_team} className="w-20 h-14 object-cover rounded-lg shadow-sm mb-3 border border-slate-200" />
+                    <span className="font-black text-sm text-slate-800 text-center uppercase tracking-wider">{m.home_team}</span>
                   </div>
                   
-                  <div className="bg-slate-50 px-4 py-2 rounded-xl font-black text-2xl text-slate-800 border border-slate-200 shadow-inner">
-                    {isFinished ? m.home_score : '-'} <span className="text-slate-400 mx-1">:</span> {isFinished ? m.away_score : '-'}
+                  <div className="bg-slate-50 px-6 py-3 rounded-2xl font-black text-4xl text-indigo-950 border-2 border-slate-100 shadow-inner">
+                    {isFinished ? m.home_score : '-'} <span className="text-slate-300 mx-1">:</span> {isFinished ? m.away_score : '-'}
                   </div>
 
                   <div className="flex flex-col items-center w-1/3">
-                    <img src={m.away_flag} alt={m.away_team} className="w-16 h-12 object-cover rounded shadow-sm mb-3 border border-slate-200" />
-                    <span className="font-bold text-sm text-slate-700 text-center uppercase tracking-wide">{m.away_team}</span>
+                    <img src={m.away_flag} alt={m.away_team} className="w-20 h-14 object-cover rounded-lg shadow-sm mb-3 border border-slate-200" />
+                    <span className="font-black text-sm text-slate-800 text-center uppercase tracking-wider">{m.away_team}</span>
                   </div>
                 </div>
 
-                <div className="text-center mb-6">
-                  <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-4 py-1.5 rounded-full shadow-sm">
+                <div className="text-center mb-8">
+                  <div className="inline-block bg-amber-100 border border-amber-200 text-amber-800 text-sm font-black px-6 py-2 rounded-full shadow-sm tracking-wide">
                     Pozo en juego: {m.pozoTotal} Bs
                   </div>
                   {isFinished && (
-                    <div className={`mt-2 text-xs font-black p-2 rounded-lg ${m.ganadores.length > 0 ? 'bg-green-100 text-green-800' : 'bg-slate-100 text-slate-600'}`}>
+                    <div className={`mt-4 text-sm font-black px-4 py-3 rounded-xl uppercase tracking-wider transition-all ${m.ganadores.length > 0 ? 'bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.5)]' : 'bg-slate-100 text-slate-500 border border-slate-200'}`}>
                       {m.mensajeResultado}
                     </div>
                   )}
                 </div>
 
-                {!isFinished && !locked ? (
+                {!locked ? (
                   <form 
                     onSubmit={(e) => { e.preventDefault(); predict(m.id, e.target.home.value, e.target.away.value); }}
-                    className="bg-slate-50 p-3 rounded-xl flex justify-between items-center border border-slate-200 mb-6"
+                    className="bg-slate-50 p-4 rounded-2xl flex justify-between items-center border border-slate-200 mb-6 shadow-inner"
                   >
-                    <input type="number" name="home" min="0" required defaultValue={myP?.home_score} className="w-14 bg-white border border-slate-300 rounded-lg p-2 text-center text-lg font-black text-slate-800 outline-none focus:border-blue-500" />
-                    <button type="submit" className="bg-blue-600 text-white font-black px-6 py-2.5 rounded-lg text-xs hover:bg-blue-700 shadow-md uppercase tracking-widest">
+                    <input type="number" name="home" min="0" required defaultValue={myP?.home_score} className="w-16 h-12 bg-white border-2 border-slate-200 rounded-xl text-center text-xl font-black text-indigo-950 outline-none focus:border-indigo-500" />
+                    <button type="submit" className="bg-indigo-600 text-white font-black px-8 py-3 rounded-xl text-xs hover:bg-indigo-700 shadow-lg shadow-indigo-600/30 uppercase tracking-widest transition-transform active:scale-95">
                       {myP ? 'Modificar' : 'Apostar'}
                     </button>
-                    <input type="number" name="away" min="0" required defaultValue={myP?.away_score} className="w-14 bg-white border border-slate-300 rounded-lg p-2 text-center text-lg font-black text-slate-800 outline-none focus:border-blue-500" />
+                    <input type="number" name="away" min="0" required defaultValue={myP?.away_score} className="w-16 h-12 bg-white border-2 border-slate-200 rounded-xl text-center text-xl font-black text-indigo-950 outline-none focus:border-indigo-500" />
                   </form>
                 ) : (
-                  <div className="bg-slate-50 p-4 rounded-xl text-center border border-slate-200 mb-6">
-                    <p className="text-[10px] text-slate-400 uppercase font-bold mb-1 tracking-widest">Tu predicción anotada</p>
-                    <p className="text-xl font-black text-slate-600">{myP?.home_score ?? '-'} : {myP?.away_score ?? '-'}</p>
+                  <div className="bg-slate-50 p-4 rounded-2xl text-center border border-slate-200 mb-6">
+                    <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">Tu predicción</p>
+                    <p className="text-2xl font-black text-indigo-600">{myP?.home_score ?? '-'} : {myP?.away_score ?? '-'}</p>
                   </div>
                 )}
 
-                <div className="mt-auto border-t border-slate-100 pt-4">
-                  <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">Apuestas registradas</h3>
-                  {matchPredictions.length > 0 ? (
-                    <div className="max-h-40 overflow-y-auto pr-1">
-                      <table className="w-full text-left text-sm">
-                        <thead className="bg-slate-100 text-slate-500 text-[10px] uppercase">
-                          <tr>
-                            <th className="py-2 px-3 font-bold rounded-l-lg">Jugador</th>
-                            <th className="py-2 px-3 font-bold text-center rounded-r-lg">Marcador</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {matchPredictions.map(p => (
-                            <tr key={p.user_name} className={p.user_name === user ? 'bg-blue-50/50' : ''}>
-                              <td className="py-2 px-3 text-slate-700 font-medium">{p.user_name}</td>
-                              <td className="py-2 px-3 text-center font-bold text-blue-600">{p.home_score} : {p.away_score}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                <div className="mt-auto border-t border-slate-100 pt-5">
+                  <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Apuestas de la Familia</h3>
+                  {locked ? (
+                    matchPredictions.length > 0 ? (
+                      <div className="max-h-40 overflow-y-auto pr-2 scrollbar-thin">
+                        <table className="w-full text-left text-sm">
+                          <tbody className="divide-y divide-slate-100">
+                            {matchPredictions.map(p => {
+                              const acerto = isFinished && p.home_score === m.home_score && p.away_score === m.away_score;
+                              return (
+                                <tr key={p.user_name} className={p.user_name === user ? 'bg-indigo-50/50' : ''}>
+                                  <td className="py-2.5 px-3 text-slate-700 font-bold">{p.user_name}</td>
+                                  <td className={`py-2.5 px-3 text-right font-black ${acerto ? 'text-green-500' : 'text-indigo-600'}`}>{p.home_score} : {p.away_score}</td>
+                                </tr>
+                              )
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic text-center font-bold">Nadie apostó.</p>
+                    )
                   ) : (
-                    <p className="text-xs text-slate-400 italic text-center py-2">Nadie apostó aún.</p>
+                    <div className="bg-amber-50 border border-amber-100 text-amber-600 text-[11px] font-black text-center py-3 rounded-xl uppercase tracking-widest">
+                      🔒 Secretas hasta el cierre
+                    </div>
                   )}
                 </div>
 
@@ -257,6 +276,63 @@ const predict = async (matchId, home, away) => {
             )
           })}
         </div>
+
+        {/* TABLA DE RESUMEN GLOBAL ESTILO EXCEL */}
+        <div className="mt-16 bg-white rounded-[2rem] shadow-xl border border-slate-200 overflow-hidden mb-10">
+          <div className="bg-indigo-950 p-5 border-b border-indigo-900">
+            <h2 className="text-lg font-black text-white uppercase tracking-widest text-center">Resumen General de Predicciones</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-center border-collapse text-sm">
+              <thead className="bg-slate-50 text-slate-500 font-black uppercase text-[10px] tracking-wider border-b-2 border-slate-200">
+                <tr>
+                  <th className="p-4 border-r border-slate-200 text-left min-w-[120px]">Jugador</th>
+                  {matchesConPozo.map(m => (
+                    <th key={m.id} className="p-3 border-r border-slate-200 min-w-[80px]">
+                      <div className="text-indigo-600 mb-1">{m.time}</div>
+                      <div>{m.home_team.substring(0,3)}<br/>vs<br/>{m.away_team.substring(0,3)}</div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {Array.from(jugadoresUnicosSet).map(jugador => (
+                  <tr key={jugador} className="hover:bg-slate-50 transition-colors">
+                    <td className="p-4 font-black text-left text-slate-700 border-r border-slate-200">{jugador}</td>
+                    {matchesConPozo.map(m => {
+                      const p = predictions.find(pred => pred.match_id === m.id && pred.user_name === jugador);
+                      let content = "-";
+                      let bgClass = "";
+                      
+                      if (p) {
+                        const isMatchLocked = isLocked(m.time) || m.status === 'FINISHED';
+                        if (isMatchLocked || jugador === user) {
+                          content = `${p.home_score} - ${p.away_score}`;
+                          if (m.status === 'FINISHED') {
+                            if (p.home_score === m.home_score && p.away_score === m.away_score) {
+                              bgClass = "bg-green-500 text-white shadow-inner";
+                            } else {
+                              bgClass = "bg-red-400 text-white shadow-inner";
+                            }
+                          }
+                        } else {
+                          content = "🔒";
+                        }
+                      }
+
+                      return (
+                        <td key={m.id} className={`p-3 font-black border-r border-slate-200 ${bgClass}`}>
+                          {content}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </div>
   );
