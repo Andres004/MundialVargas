@@ -44,7 +44,6 @@ export default function App() {
       const channel = supabase
         .channel('public-changes')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'predictions' }, () => {
-          // Esto descarga las apuestas de los demás en tiempo real sin que refresques
           fetchPredictions();
         })
         .subscribe();
@@ -69,13 +68,10 @@ export default function App() {
     setUser(formattedName);
   };
 
-  // ⚡ NUEVO PREDICT: Instantáneo, sin alertas y con autoguardado
   const predict = async (matchId, home, away) => {
-    // Permitimos campos vacíos temporalmente mientras teclean
     const homeVal = home === '' ? '' : parseInt(home) || 0;
     const awayVal = away === '' ? '' : parseInt(away) || 0;
 
-    // ACTUALIZACIÓN INSTANTÁNEA EN PANTALLA (Para que no sientan lag al teclear)
     setPredictions(prev => {
       const newList = [...prev];
       const index = newList.findIndex(p => p.match_id === matchId && p.user_name === user);
@@ -87,17 +83,15 @@ export default function App() {
       return newList;
     });
 
-    // GUARDADO SILENCIOSO EN BASE DE DATOS
     const { error } = await supabase.from('predictions').upsert({
       user_name: user, 
       match_id: matchId, 
-      home_score: homeVal === '' ? 0 : homeVal, // Si lo borran, asume 0 en BD
+      home_score: homeVal === '' ? 0 : homeVal, 
       away_score: awayVal === '' ? 0 : awayVal
     }, { onConflict: 'user_name,match_id' });
     
     if (error) {
       console.error("Error al guardar: " + error.message); 
-      // Si falla tu internet, recarga los datos reales
       fetchPredictions(); 
     }
   };
@@ -245,16 +239,16 @@ export default function App() {
                   )}
                 </div>
 
-                {/* ⚡ NUEVA ZONA DE APUESTAS: Sin botón, autoguardado */}
                 {!locked ? (
                   <div className="mb-6">
-                    <div className="bg-slate-50 p-4 rounded-2xl flex justify-center items-center gap-6 border border-slate-200 shadow-inner">
+                    {/* CORRECCIÓN: flex-row y flex-nowrap para evitar que se apilen */}
+                    <div className="bg-slate-50 p-4 rounded-2xl flex flex-row flex-nowrap justify-center items-center gap-2 border border-slate-200 shadow-inner">
                       <input 
                         type="number" 
                         min="0" 
                         value={myP && myP.home_score !== '' ? myP.home_score : ''} 
                         onChange={(e) => predict(m.id, e.target.value, myP?.away_score ?? '')} 
-                        className="w-20 h-14 bg-white border-2 border-slate-200 rounded-xl text-center text-2xl font-black text-indigo-950 outline-none focus:border-indigo-500 transition-all" 
+                        className="w-16 h-12 bg-white border-2 border-slate-200 rounded-xl text-center text-xl font-black text-indigo-950 outline-none focus:border-indigo-500 transition-all" 
                         placeholder="-"
                       />
                       <span className="text-xl font-black text-slate-300">:</span>
@@ -263,7 +257,7 @@ export default function App() {
                         min="0" 
                         value={myP && myP.away_score !== '' ? myP.away_score : ''} 
                         onChange={(e) => predict(m.id, myP?.home_score ?? '', e.target.value)} 
-                        className="w-20 h-14 bg-white border-2 border-slate-200 rounded-xl text-center text-2xl font-black text-indigo-950 outline-none focus:border-indigo-500 transition-all" 
+                        className="w-16 h-12 bg-white border-2 border-slate-200 rounded-xl text-center text-xl font-black text-indigo-950 outline-none focus:border-indigo-500 transition-all" 
                         placeholder="-"
                       />
                     </div>
