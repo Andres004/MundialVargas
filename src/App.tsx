@@ -29,7 +29,6 @@ export default function App() {
   const hoyStr = FECHA_DE_PARTIDOS; 
   const datosGuardados = JSON.parse(localStorage.getItem('pollaData') || '{}');
   
-  // Si la fecha guardada en el celular no coincide con FECHA_DE_PARTIDOS, pedirá el nombre de nuevo
   const [user, setUser] = useState(datosGuardados.fecha === hoyStr ? datosGuardados.nombre : '');
   const [nameInput, setNameInput] = useState('');
   
@@ -95,11 +94,9 @@ export default function App() {
     return diffMinutes <= 30; // Bloqueo 30 minutos antes
   };
 
-  // 1. FILTRAMOS SOLO LAS APUESTAS DE HOY (IDs 201 en adelante)
   const idsDeHoy = matches.map(m => m.id);
   const prediccionesDeHoy = predictions.filter(p => idsDeHoy.includes(p.match_id));
   
-  // 2. CONTAMOS SOLO A LOS JUGADORES QUE HAN APOSTADO HOY
   const jugadoresUnicosSet = new Set(prediccionesDeHoy.map(p => p.user_name));
   const jugadoresUnicosHoy = jugadoresUnicosSet.size;
   
@@ -116,7 +113,6 @@ export default function App() {
 
   horasOrdenadas.forEach(hora => {
     const grupo = partidosPorHora[hora];
-    // Se divide el pozo acumulado entre los partidos de la misma hora
     const acumuladoRepartido = acumuladoEnJuego / grupo.length;
     let acumuladoParaSiguienteHora = 0;
 
@@ -132,7 +128,7 @@ export default function App() {
       if (m.status === 'FINISHED') {
         if (ganadores.length > 0) {
           const premio = (pozoTotal / ganadores.length).toFixed(2);
-          mensajeResultado = `GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
+          mensajeResultado = `🏆 GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
         } else {
           mensajeResultado = "Nadie acertó. El pozo pasa al siguiente turno.";
           acumuladoParaSiguienteHora += pozoTotal; 
@@ -249,32 +245,36 @@ export default function App() {
                   </div>
                 )}
 
+                {/* LISTA DE APUESTAS (Con efecto borroso si está abierto) */}
                 <div className="mt-auto border-t border-slate-100 pt-5">
                   <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Apuestas de la Familia</h3>
-                  {locked ? (
-                    matchPredictions.length > 0 ? (
-                      <div className="max-h-40 overflow-y-auto pr-2 scrollbar-thin">
-                        <table className="w-full text-left text-sm">
-                          <tbody className="divide-y divide-slate-100">
-                            {matchPredictions.map(p => {
-                              const acerto = isFinished && p.home_score === m.home_score && p.away_score === m.away_score;
-                              return (
-                                <tr key={p.user_name} className={p.user_name === user ? 'bg-indigo-50/50' : ''}>
-                                  <td className="py-2.5 px-3 text-slate-700 font-bold">{p.user_name}</td>
-                                  <td className={`py-2.5 px-3 text-right font-black ${acerto ? 'text-green-500' : 'text-indigo-600'}`}>{p.home_score} : {p.away_score}</td>
-                                </tr>
-                              )
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-slate-400 italic text-center font-bold">Nadie apostó.</p>
-                    )
-                  ) : (
-                    <div className="bg-amber-50 border border-amber-100 text-amber-600 text-[11px] font-black text-center py-3 rounded-xl uppercase tracking-widest">
-                      [ OCULTAS HASTA EL CIERRE ]
+                  {matchPredictions.length > 0 ? (
+                    <div className="max-h-40 overflow-y-auto pr-2 scrollbar-thin">
+                      <table className="w-full text-left text-sm">
+                        <tbody className="divide-y divide-slate-100">
+                          {matchPredictions.map(p => {
+                            const isMyPrediction = p.user_name === user;
+                            const showScore = locked || isMyPrediction;
+                            const acerto = isFinished && p.home_score === m.home_score && p.away_score === m.away_score;
+                            
+                            return (
+                              <tr key={p.user_name} className={isMyPrediction ? 'bg-indigo-50/50' : ''}>
+                                <td className="py-2.5 px-3 text-slate-700 font-bold">{p.user_name}</td>
+                                <td className={`py-2.5 px-3 text-right font-black ${acerto ? 'text-green-500' : 'text-indigo-600'}`}>
+                                  {showScore ? (
+                                    `${p.home_score} : ${p.away_score}`
+                                  ) : (
+                                    <span className="blur-sm opacity-40 select-none text-slate-500">0 : 0</span>
+                                  )}
+                                </td>
+                              </tr>
+                            )
+                          })}
+                        </tbody>
+                      </table>
                     </div>
+                  ) : (
+                    <p className="text-xs text-slate-400 italic text-center font-bold">Nadie apostó aún.</p>
                   )}
                 </div>
 
@@ -307,13 +307,15 @@ export default function App() {
                     <td className="p-4 font-black text-left text-slate-700 border-r border-slate-200">{jugador}</td>
                     {matchesConPozo.map(m => {
                       const p = prediccionesDeHoy.find(pred => pred.match_id === m.id && pred.user_name === jugador);
-                      let content = "-";
+                      let content = <span className="text-slate-300">-</span>;
                       let bgClass = "";
                       
                       if (p) {
                         const isMatchLocked = isLocked(m.time) || m.status === 'FINISHED';
-                        if (isMatchLocked || jugador === user) {
-                          content = `${p.home_score} - ${p.away_score}`;
+                        const isMyPrediction = jugador === user;
+
+                        if (isMatchLocked || isMyPrediction) {
+                          content = <span>{p.home_score} - {p.away_score}</span>;
                           if (m.status === 'FINISHED') {
                             if (p.home_score === m.home_score && p.away_score === m.away_score) {
                               bgClass = "bg-green-500 text-white shadow-inner";
@@ -322,7 +324,8 @@ export default function App() {
                             }
                           }
                         } else {
-                          content = "SECRETO";
+                          // Efecto borroso para apuestas secretas en la tabla
+                          content = <span className="blur-sm opacity-40 select-none text-slate-500">0 - 0</span>;
                         }
                       }
 
