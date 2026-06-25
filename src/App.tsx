@@ -212,19 +212,23 @@ export default function App() {
                 {isFinished && <div className="absolute top-0 left-0 bg-indigo-950 text-white text-[11px] font-black px-5 py-2 rounded-br-2xl uppercase tracking-widest">Finalizado</div>}
                 {locked && !isFinished && <div className="absolute top-0 left-0 bg-red-500 text-white text-[11px] font-black px-5 py-2 rounded-br-2xl uppercase tracking-widest shadow-md">Cerrado</div>}
 
-                <div className="flex justify-between items-center mt-8 mb-6">
+                {/* CORRECCIÓN DE DISEÑO AQUÍ: Se añadió gap-1 y el centro ahora es estricto en flex-row y whitespace-nowrap */}
+                <div className="flex justify-between items-center mt-8 mb-6 gap-1 sm:gap-2">
                   <div className="flex flex-col items-center w-1/3">
-                    <img src={m.home_flag} alt={m.home_team} className="w-20 h-14 object-cover rounded-lg shadow-sm mb-3 border border-slate-200" />
-                    <span className="font-black text-sm text-slate-800 text-center uppercase tracking-wider">{m.home_team}</span>
+                    <img src={m.home_flag} alt={m.home_team} className="w-16 sm:w-20 h-12 sm:h-14 object-cover rounded-lg shadow-sm mb-3 border border-slate-200" />
+                    <span className="font-black text-[11px] sm:text-sm text-slate-800 text-center uppercase tracking-wider">{m.home_team}</span>
                   </div>
                   
-                  <div className="bg-slate-50 px-6 py-3 rounded-2xl font-black text-4xl text-indigo-950 border-2 border-slate-100 shadow-inner">
-                    {isFinished ? m.home_score : '-'} <span className="text-slate-300 mx-1">:</span> {isFinished ? m.away_score : '-'}
+                  {/* FORZADO HORIZONTAL PARA EVITAR APILAMIENTO EN CELULARES */}
+                  <div className="bg-slate-50 px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-black text-3xl sm:text-4xl text-indigo-950 border-2 border-slate-100 shadow-inner flex flex-row flex-nowrap items-center justify-center whitespace-nowrap shrink-0">
+                    <span>{isFinished ? m.home_score : '-'}</span>
+                    <span className="text-slate-300 mx-2">:</span> 
+                    <span>{isFinished ? m.away_score : '-'}</span>
                   </div>
 
                   <div className="flex flex-col items-center w-1/3">
-                    <img src={m.away_flag} alt={m.away_team} className="w-20 h-14 object-cover rounded-lg shadow-sm mb-3 border border-slate-200" />
-                    <span className="font-black text-sm text-slate-800 text-center uppercase tracking-wider">{m.away_team}</span>
+                    <img src={m.away_flag} alt={m.away_team} className="w-16 sm:w-20 h-12 sm:h-14 object-cover rounded-lg shadow-sm mb-3 border border-slate-200" />
+                    <span className="font-black text-[11px] sm:text-sm text-slate-800 text-center uppercase tracking-wider">{m.away_team}</span>
                   </div>
                 </div>
 
@@ -241,7 +245,6 @@ export default function App() {
 
                 {!locked ? (
                   <div className="mb-6">
-                    {/* CORRECCIÓN: flex-row y flex-nowrap para evitar que se apilen */}
                     <div className="bg-slate-50 p-4 rounded-2xl flex flex-row flex-nowrap justify-center items-center gap-2 border border-slate-200 shadow-inner">
                       <input 
                         type="number" 
@@ -350,7 +353,6 @@ export default function App() {
                             }
                           }
                         } else {
-                          // Efecto borroso en tabla general para proteger secretos
                           content = <span className="blur-sm opacity-40 select-none text-slate-500">0 - 0</span>;
                         }
                       }
