@@ -8,7 +8,7 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // ⚙️ CONFIGURACIÓN DEL ADMINISTRADOR (TÚ)
 // =========================================================================
 
-// 1. FECHA EXACTA DE LOS PARTIDOS (Formato: AÑO-MES-DIA). 
+// 1. FECHA EXACTA DE LOS PARTIDOS
 const FECHA_DE_PARTIDOS = "2026-06-26";
 
 // 2. El sobrante exacto de los partidos anteriores
@@ -16,14 +16,14 @@ const POZO_AYER = 144.375;
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
-// ¡OJO! Hoy usamos la serie 300 (301, 302...). Mañana usa la 400, etc.
+// 🚨 TRUCO: Como hoy es 26, usamos los IDs 2601, 2602... para que la BD sepa que es nuevo.
 const PARTIDOS_DE_HOY = [
-  { id: 301, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-  { id: 302, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-  { id: 303, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 304, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 305, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
-  { id: 306, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
+  { id: 2601, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 2602, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 2603, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 2604, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 2605, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
+  { id: 2606, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
 ];
 
 export default function App() {
@@ -107,6 +107,7 @@ export default function App() {
     return diffMinutes <= 30; 
   };
 
+  // Solo filtramos las apuestas que coincidan con los IDs 2601, 2602... de hoy
   const idsDeHoy = matches.map(m => m.id);
   const prediccionesDeHoy = predictions.filter(p => idsDeHoy.includes(p.match_id));
   
