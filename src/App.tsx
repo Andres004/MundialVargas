@@ -16,7 +16,7 @@ const POZO_AYER = 144.375;
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
-// 🚨 TRUCO: Como hoy es 26, usamos los IDs 2601, 2602... para que la BD sepa que es nuevo.
+// 🚨 SERIE 2600: IDs nuevos para el día 26. (Mañana usa 2701, etc.)
 const PARTIDOS_DE_HOY = [
   { id: 2601, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
   { id: 2602, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
@@ -33,7 +33,6 @@ export default function App() {
   const [user, setUser] = useState(datosGuardados.fecha === hoyStr ? datosGuardados.nombre : '');
   const [nameInput, setNameInput] = useState('');
   
-  const [matches, setMatches] = useState(PARTIDOS_DE_HOY);
   const [predictions, setPredictions] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -107,8 +106,8 @@ export default function App() {
     return diffMinutes <= 30; 
   };
 
-  // Solo filtramos las apuestas que coincidan con los IDs 2601, 2602... de hoy
-  const idsDeHoy = matches.map(m => m.id);
+  // ⚡ FILTRO ESTRICTO: Solo las apuestas que coincidan con los IDs de hoy (2601+)
+  const idsDeHoy = PARTIDOS_DE_HOY.map(m => m.id);
   const prediccionesDeHoy = predictions.filter(p => idsDeHoy.includes(p.match_id));
   
   const jugadoresUnicosSet = new Set(prediccionesDeHoy.map(p => p.user_name));
@@ -117,7 +116,7 @@ export default function App() {
   let acumuladoEnJuego = POZO_AYER; 
 
   const partidosPorHora = {};
-  matches.forEach(m => {
+  PARTIDOS_DE_HOY.forEach(m => {
     if (!partidosPorHora[m.time]) partidosPorHora[m.time] = [];
     partidosPorHora[m.time].push(m);
   });
@@ -179,7 +178,7 @@ export default function App() {
     );
   }
 
-  const recaudacionTotalDelDia = jugadoresUnicosHoy * (PRECIO_POR_PARTIDO * matches.length);
+  const recaudacionTotalDelDia = jugadoresUnicosHoy * (PRECIO_POR_PARTIDO * PARTIDOS_DE_HOY.length);
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-12" style={{ fontFamily: "'Outfit', sans-serif" }}>
