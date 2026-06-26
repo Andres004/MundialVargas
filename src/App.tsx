@@ -20,7 +20,9 @@ const PARTIDOS_DE_HOY = [
   { id: 201, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
   { id: 202, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
   { id: 203, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 204, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' }
+  { id: 204, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 205, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
+  { id: 206, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
 ];
 
 export default function App() {
@@ -160,7 +162,7 @@ export default function App() {
         <form onSubmit={login} className="bg-white p-8 md:p-10 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-sm">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-black text-indigo-900 tracking-tight uppercase">Mundial Vargas</h1>
-            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: 12 Bs (3 Bs x 4 partidos).</p>
+            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: 18 Bs (3 Bs x 6 partidos).</p>
           </div>
           <input 
             type="text" placeholder="Ingresa tu nombre..." required
