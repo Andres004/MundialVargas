@@ -9,20 +9,18 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS (Formato: AÑO-MES-DIA). 
-const FECHA_DE_PARTIDOS = "2026-06-25";
+const FECHA_DE_PARTIDOS = "2026-06-26";
 
 // 2. El sobrante exacto de los partidos anteriores
-const POZO_AYER = 115.5; 
+const POZO_AYER = 144.375; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
 const PARTIDOS_DE_HOY = [
-  { id: 201, home_team: 'Ecuador', away_team: 'Alemania', home_flag: 'https://flagcdn.com/w80/ec.png', away_flag: 'https://flagcdn.com/w80/de.png', home_score: 2, away_score: 1, status: 'FINISHED', time: '16:00' },
-  { id: 202, home_team: 'Curazao', away_team: 'C. Marfil', home_flag: 'https://flagcdn.com/w80/cw.png', away_flag: 'https://flagcdn.com/w80/ci.png', home_score: 0, away_score: 2, status: 'FINISHED', time: '16:00' },
-  { id: 203, home_team: 'Japón', away_team: 'Suecia', home_flag: 'https://flagcdn.com/w80/jp.png', away_flag: 'https://flagcdn.com/w80/se.png', home_score: 1, away_score: 1, status: 'FINISHED', time: '19:00' },
-  { id: 204, home_team: 'Países Bajos', away_team: 'Túnez', home_flag: 'https://flagcdn.com/w80/nl.png', away_flag: 'https://flagcdn.com/w80/tn.png', home_score: 3, away_score: 1, status: 'FINISHED', time: '19:00' },
-  { id: 205, home_team: 'EE.UU.', away_team: 'Turquía', home_flag: 'https://flagcdn.com/w80/us.png', away_flag: 'https://flagcdn.com/w80/tr.png', home_score: 2, away_score: 3, status: 'FINISHED', time: '22:00' },
-  { id: 206, home_team: 'Paraguay', away_team: 'Australia', home_flag: 'https://flagcdn.com/w80/py.png', away_flag: 'https://flagcdn.com/w80/au.png', home_score: 0, away_score: 0, status: 'FINISHED', time: '22:00' }
+  { id: 201, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 202, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 203, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 204, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' }
 ];
 
 export default function App() {
@@ -162,7 +160,7 @@ export default function App() {
         <form onSubmit={login} className="bg-white p-8 md:p-10 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-sm">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-black text-indigo-900 tracking-tight uppercase">Mundial Vargas</h1>
-            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: 18 Bs (3 Bs x 6 partidos).</p>
+            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: 12 Bs (3 Bs x 4 partidos).</p>
           </div>
           <input 
             type="text" placeholder="Ingresa tu nombre..." required
@@ -212,14 +210,12 @@ export default function App() {
                 {isFinished && <div className="absolute top-0 left-0 bg-indigo-950 text-white text-[11px] font-black px-5 py-2 rounded-br-2xl uppercase tracking-widest">Finalizado</div>}
                 {locked && !isFinished && <div className="absolute top-0 left-0 bg-red-500 text-white text-[11px] font-black px-5 py-2 rounded-br-2xl uppercase tracking-widest shadow-md">Cerrado</div>}
 
-                {/* CORRECCIÓN DE DISEÑO AQUÍ: Se añadió gap-1 y el centro ahora es estricto en flex-row y whitespace-nowrap */}
                 <div className="flex justify-between items-center mt-8 mb-6 gap-1 sm:gap-2">
                   <div className="flex flex-col items-center w-1/3">
                     <img src={m.home_flag} alt={m.home_team} className="w-16 sm:w-20 h-12 sm:h-14 object-cover rounded-lg shadow-sm mb-3 border border-slate-200" />
                     <span className="font-black text-[11px] sm:text-sm text-slate-800 text-center uppercase tracking-wider">{m.home_team}</span>
                   </div>
                   
-                  {/* FORZADO HORIZONTAL PARA EVITAR APILAMIENTO EN CELULARES */}
                   <div className="bg-slate-50 px-4 py-2 sm:px-6 sm:py-3 rounded-2xl font-black text-3xl sm:text-4xl text-indigo-950 border-2 border-slate-100 shadow-inner flex flex-row flex-nowrap items-center justify-center whitespace-nowrap shrink-0">
                     <span>{isFinished ? m.home_score : '-'}</span>
                     <span className="text-slate-300 mx-2">:</span> 
