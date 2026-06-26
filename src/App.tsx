@@ -16,13 +16,14 @@ const POZO_AYER = 144.375;
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
+// ¡OJO! Hoy usamos la serie 300 (301, 302...). Mañana usa la 400, etc.
 const PARTIDOS_DE_HOY = [
-  { id: 201, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-  { id: 202, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
-  { id: 203, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 204, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 205, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
-  { id: 206, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
+  { id: 301, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 302, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 303, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 304, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 305, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
+  { id: 306, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
 ];
 
 export default function App() {
