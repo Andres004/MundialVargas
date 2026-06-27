@@ -20,8 +20,8 @@ const PRECIO_POR_PARTIDO = 3;
 const PARTIDOS_DE_HOY = [
   { id: 2601, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 1, away_score: 4, status: 'FINISHED', time: '15:00' },
   { id: 2602, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 5, away_score: 0, status: 'FINISHED', time: '15:00' },
-  { id: 2603, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 2604, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 2603, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'FINISHED', time: '20:00' },
+  { id: 2604, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 1, status: 'FINISHED', time: '20:00' },
   { id: 2605, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
   { id: 2606, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
 ];
