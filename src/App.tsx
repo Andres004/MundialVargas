@@ -5,25 +5,25 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_publishable_OGy26eyySr3gpRsKC1imtA_iOzL_0Hm');
 
 // =========================================================================
-// ⚙️ CONFIGURACIÓN DEL ADMINISTRADOR (TÚ)
+// CONFIGURACIÓN DEL ADMINISTRADOR (TÚ)
 // =========================================================================
 
-// 1. FECHA EXACTA DE LOS PARTIDOS
-const FECHA_DE_PARTIDOS = "2026-06-26";
+// 1. FECHA EXACTA DE LOS PARTIDOS (Formato: AÑO-MES-DIA). 
+const FECHA_DE_PARTIDOS = "2026-06-27";
 
 // 2. El sobrante exacto de los partidos anteriores
-const POZO_AYER = 144.375; 
+const POZO_AYER = 162.1875; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
-// 🚨 SERIE 2600: IDs nuevos para el día 26. (Mañana usa 2701, etc.)
+// SERIE 2700: IDs nuevos para el día 27.
 const PARTIDOS_DE_HOY = [
-  { id: 2601, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 1, away_score: 4, status: 'FINISHED', time: '15:00' },
-  { id: 2602, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 5, away_score: 0, status: 'FINISHED', time: '15:00' },
-  { id: 2603, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'FINISHED', time: '20:00' },
-  { id: 2604, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 1, status: 'FINISHED', time: '20:00' },
-  { id: 2605, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 1, away_score: 5, status: 'FINISHED', time: '23:00' },
-  { id: 2606, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 1, away_score: 1, status: 'FINISHED', time: '23:00' }
+  { id: 2701, home_team: 'Panamá', away_team: 'Inglaterra', home_flag: 'https://flagcdn.com/w80/pa.png', away_flag: 'https://flagcdn.com/w80/gb-eng.png', home_score: 0, away_score: 0, status: 'PENDING', time: '17:00' },
+  { id: 2702, home_team: 'Croacia', away_team: 'Ghana', home_flag: 'https://flagcdn.com/w80/hr.png', away_flag: 'https://flagcdn.com/w80/gh.png', home_score: 0, away_score: 0, status: 'PENDING', time: '17:00' },
+  { id: 2703, home_team: 'Colombia', away_team: 'Portugal', home_flag: 'https://flagcdn.com/w80/co.png', away_flag: 'https://flagcdn.com/w80/pt.png', home_score: 0, away_score: 0, status: 'PENDING', time: '19:30' },
+  { id: 2704, home_team: 'RD Congo', away_team: 'Uzbekistán', home_flag: 'https://flagcdn.com/w80/cd.png', away_flag: 'https://flagcdn.com/w80/uz.png', home_score: 0, away_score: 0, status: 'PENDING', time: '19:30' },
+  { id: 2705, home_team: 'Argelia', away_team: 'Austria', home_flag: 'https://flagcdn.com/w80/dz.png', away_flag: 'https://flagcdn.com/w80/at.png', home_score: 0, away_score: 0, status: 'PENDING', time: '22:00' },
+  { id: 2706, home_team: 'Jordania', away_team: 'Argentina', home_flag: 'https://flagcdn.com/w80/jo.png', away_flag: 'https://flagcdn.com/w80/ar.png', home_score: 0, away_score: 0, status: 'PENDING', time: '22:00' }
 ];
 
 export default function App() {
@@ -109,7 +109,7 @@ export default function App() {
     return diffMinutes <= 30; 
   };
 
-  // ⚡ FILTRO ESTRICTO: Solo las apuestas que coincidan con los IDs de hoy (2601+)
+  // FILTRO ESTRICTO: Solo las apuestas que coincidan con los IDs de hoy
   const idsDeHoy = PARTIDOS_DE_HOY.map(m => m.id);
   const prediccionesDeHoy = predictions.filter(p => idsDeHoy.includes(p.match_id));
   
@@ -144,7 +144,7 @@ export default function App() {
       if (m.status === 'FINISHED') {
         if (ganadores.length > 0) {
           const premio = (pozoTotal / ganadores.length).toFixed(2);
-          mensajeResultado = `🏆 GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
+          mensajeResultado = `GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
         } else {
           mensajeResultado = "Nadie acertó. El pozo pasa al siguiente turno.";
           acumuladoParaSiguienteHora += pozoTotal; 
