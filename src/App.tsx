@@ -16,14 +16,14 @@ const POZO_AYER = 144.375;
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
-// 🚨 SERIE 2600: IDs nuevos para el día 26. (Mañana usa 2701, etc.)
+// 🚨 IDs SERIE 3000 PARA FORZAR EL REINICIO TOTAL HOY.
 const PARTIDOS_DE_HOY = [
-  { id: 2601, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 1, away_score: 4, status: 'FINISHED', time: '15:00' },
-  { id: 2602, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 5, away_score: 0, status: 'FINISHED', time: '15:00' },
-  { id: 2603, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 2604, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
-  { id: 2605, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
-  { id: 2606, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
+  { id: 3001, home_team: 'Noruega', away_team: 'Francia', home_flag: 'https://flagcdn.com/w80/no.png', away_flag: 'https://flagcdn.com/w80/fr.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 3002, home_team: 'Senegal', away_team: 'Irak', home_flag: 'https://flagcdn.com/w80/sn.png', away_flag: 'https://flagcdn.com/w80/iq.png', home_score: 0, away_score: 0, status: 'PENDING', time: '15:00' },
+  { id: 3003, home_team: 'Cabo Verde', away_team: 'Arabia Saudita', home_flag: 'https://flagcdn.com/w80/cv.png', away_flag: 'https://flagcdn.com/w80/sa.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 3004, home_team: 'Uruguay', away_team: 'España', home_flag: 'https://flagcdn.com/w80/uy.png', away_flag: 'https://flagcdn.com/w80/es.png', home_score: 0, away_score: 0, status: 'PENDING', time: '20:00' },
+  { id: 3005, home_team: 'Nueva Zelanda', away_team: 'Bélgica', home_flag: 'https://flagcdn.com/w80/nz.png', away_flag: 'https://flagcdn.com/w80/be.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' },
+  { id: 3006, home_team: 'Egipto', away_team: 'Irán', home_flag: 'https://flagcdn.com/w80/eg.png', away_flag: 'https://flagcdn.com/w80/ir.png', home_score: 0, away_score: 0, status: 'PENDING', time: '23:00' }
 ];
 
 export default function App() {
@@ -33,8 +33,12 @@ export default function App() {
   const [user, setUser] = useState(datosGuardados.fecha === hoyStr ? datosGuardados.nombre : '');
   const [nameInput, setNameInput] = useState('');
   
+  const [matches, setMatches] = useState(PARTIDOS_DE_HOY);
   const [predictions, setPredictions] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // NUEVO ESTADO PARA CONTROLAR LA VENTANA DE REGLAS
+  const [showRules, setShowRules] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 30000);
@@ -106,7 +110,6 @@ export default function App() {
     return diffMinutes <= 30; 
   };
 
-  // ⚡ FILTRO ESTRICTO: Solo las apuestas que coincidan con los IDs de hoy (2601+)
   const idsDeHoy = PARTIDOS_DE_HOY.map(m => m.id);
   const prediccionesDeHoy = predictions.filter(p => idsDeHoy.includes(p.match_id));
   
@@ -184,10 +187,55 @@ export default function App() {
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-12" style={{ fontFamily: "'Outfit', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');`}</style>
       
+      {/* 📖 MODAL DEL REGLAMENTO 📖 */}
+      {showRules && (
+        <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
+          <div className="bg-white rounded-[2rem] w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border border-slate-200">
+            <div className="p-5 md:p-6 border-b border-slate-100 flex justify-between items-center bg-indigo-50/50">
+              <h2 className="text-lg md:text-xl font-black text-indigo-950 uppercase tracking-tight">Reglamento Oficial</h2>
+              <button onClick={() => setShowRules(false)} className="bg-white text-indigo-600 hover:text-white hover:bg-indigo-600 border border-indigo-200 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-colors shadow-sm">
+                Cerrar ✕
+              </button>
+            </div>
+            <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-sm md:text-base text-slate-600 scrollbar-thin">
+              <p className="text-center font-black text-indigo-900 mb-6 uppercase text-lg">REGLAMENTO DEL JUEGO DE PRONÓSTICOS <br/>MUNDIAL DE FÚTBOL</p>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">1. Aporte</span>Cada participante aporta Bs 3 por partido. El pozo de cada juego se conformará con el total de los aportes de los participantes.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">2. Mecánica</span>En cada partido se pronostica únicamente el equipo ganador.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">3. En caso de penales</span>Si un partido se define por penales, para efectos del juego se considerará como ganador al equipo que gane la tanda de penales.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">4. Premios</span>El pozo de cada partido se repartirá en partes iguales entre todos los participantes que acierten el resultado.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">5. Acumulación</span>Si nadie acierta el resultado o un partido es suspendido, el pozo se acumulará para el siguiente partido. Si existen dos o más partidos programados a la misma hora, el pozo acumulado se dividirá en partes iguales entre ellos y cada partido continuará con su acumulado de forma independiente.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">6. Continuidad del acumulado</span>El pozo acumulado continuará partido tras partido hasta que exista al menos un ganador.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">7. Retiro de participantes</span>Si un participante decide retirarse del juego, perderá el derecho a cualquier pozo acumulado generado hasta ese momento.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">8. Ingreso de nuevos participantes</span>Quien ingrese después de iniciado el juego podrá participar únicamente de los pozos generados desde la fecha de su ingreso y no tendrá derecho a los acumulados anteriores.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">9. Cierre del acumulado</span>Si el pozo acumulado llega hasta la final del Mundial, este se disputará únicamente en ese partido y se otorgará a quien acierte el equipo campeón. Si existen varios acertantes, el pozo se dividirá en partes iguales entre ellos.</div>
+              
+              <div><span className="font-black text-indigo-700 block mb-1">10. Aceptación del reglamento</span>La participación en el juego implica la aceptación total de las presentes reglas.</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <header className="bg-white sticky top-0 z-50 p-5 border-b border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-center gap-4">
-        <div className="text-center md:text-left">
-          <h1 className="text-2xl md:text-3xl font-black text-indigo-950 uppercase tracking-tight">Mundial Vargas</h1>
-          <p className="text-sm text-slate-500 mt-1 font-bold">Jugador: <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">{user}</span> | Activos Hoy: {jugadoresUnicosHoy}</p>
+        <div className="text-center md:text-left flex flex-col items-center md:items-start">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl md:text-3xl font-black text-indigo-950 uppercase tracking-tight">
+              Mundial Vargas <span className="text-xs text-indigo-300 ml-1">v3</span>
+            </h1>
+            {/* BOTÓN DE REGLAS */}
+            <button onClick={() => setShowRules(true)} className="bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-100 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors shadow-sm">
+              📖 Reglas
+            </button>
+          </div>
+          <p className="text-sm text-slate-500 mt-2 font-bold">Jugador: <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">{user}</span> | Activos Hoy: {jugadoresUnicosHoy}</p>
         </div>
         <div className="bg-indigo-50 px-6 py-2.5 rounded-2xl border border-indigo-100 text-center w-full md:w-auto shadow-inner">
           <p className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">Recaudación de Hoy</p>
