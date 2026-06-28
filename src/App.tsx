@@ -9,21 +9,28 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS (Formato: AÑO-MES-DIA). 
-const FECHA_DE_PARTIDOS = "2026-06-27";
+const FECHA_DE_PARTIDOS = "2026-06-28";
 
 // 2. El sobrante exacto de los partidos anteriores
 const POZO_AYER = 162.1875; 
 const PRECIO_POR_PARTIDO = 3; 
 
-// 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
-// SERIE 2700: IDs nuevos para el día 27.
+// 3. PARTIDOS DE ELIMINACIÓN DIRECTA.
+// advanced_team: Si el partido terminó en empate en los 90 min y se fueron a penales, 
+// escribe aquí el nombre del equipo que pasó. Si NO hubo empate, déjalo vacío ('').
 const PARTIDOS_DE_HOY = [
-  { id: 2701, home_team: 'Panamá', away_team: 'Inglaterra', home_flag: 'https://flagcdn.com/w80/pa.png', away_flag: 'https://flagcdn.com/w80/gb-eng.png', home_score: 0, away_score: 2, status: 'FINISHED', time: '17:00' },
-  { id: 2702, home_team: 'Croacia', away_team: 'Ghana', home_flag: 'https://flagcdn.com/w80/hr.png', away_flag: 'https://flagcdn.com/w80/gh.png', home_score: 2, away_score: 1, status: 'FINISHED', time: '17:00' },
-  { id: 2703, home_team: 'Colombia', away_team: 'Portugal', home_flag: 'https://flagcdn.com/w80/co.png', away_flag: 'https://flagcdn.com/w80/pt.png', home_score: 0, away_score: 0, status: 'FINISHED', time: '19:30' },
-  { id: 2704, home_team: 'RD Congo', away_team: 'Uzbekistán', home_flag: 'https://flagcdn.com/w80/cd.png', away_flag: 'https://flagcdn.com/w80/uz.png', home_score: 3, away_score: 1, status: 'FINISHED', time: '19:30' },
-  { id: 2705, home_team: 'Argelia', away_team: 'Austria', home_flag: 'https://flagcdn.com/w80/dz.png', away_flag: 'https://flagcdn.com/w80/at.png', home_score: 3, away_score: 3, status: 'FINISHED', time: '22:00' },
-  { id: 2706, home_team: 'Jordania', away_team: 'Argentina', home_flag: 'https://flagcdn.com/w80/jo.png', away_flag: 'https://flagcdn.com/w80/ar.png', home_score: 1, away_score: 3, status: 'FINISHED', time: '22:00' }
+  { 
+    id: 2801, 
+    home_team: 'Sudáfrica', 
+    away_team: 'Canadá', 
+    home_flag: 'https://flagcdn.com/w80/za.png', 
+    away_flag: 'https://flagcdn.com/w80/ca.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '15:00',
+    advanced_team: '' 
+  }
 ];
 
 export default function App() {
@@ -109,7 +116,6 @@ export default function App() {
     return diffMinutes <= 30; 
   };
 
-  // FILTRO ESTRICTO: Solo las apuestas que coincidan con los IDs de hoy
   const idsDeHoy = PARTIDOS_DE_HOY.map(m => m.id);
   const prediccionesDeHoy = predictions.filter(p => idsDeHoy.includes(p.match_id));
   
@@ -134,8 +140,31 @@ export default function App() {
 
     grupo.forEach(m => {
       const matchPreds = prediccionesDeHoy.filter(p => p.match_id === m.id);
-      const ganadores = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
       
+      let ganadores = [];
+      const aciertosExactos = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
+      
+      if (m.status === 'FINISHED') {
+        if (aciertosExactos.length > 0) {
+           ganadores = aciertosExactos;
+        } else {
+           let equipoGanadorReal = '';
+           
+           if (m.advanced_team !== '') {
+             equipoGanadorReal = m.advanced_team;
+           } else {
+             if (m.home_score > m.away_score) equipoGanadorReal = m.home_team;
+             else if (m.away_score > m.home_score) equipoGanadorReal = m.away_team;
+           }
+
+           ganadores = matchPreds.filter(p => {
+             if (equipoGanadorReal === m.home_team) return p.home_score > p.away_score;
+             if (equipoGanadorReal === m.away_team) return p.away_score > p.home_score;
+             return false;
+           });
+        }
+      }
+
       const pozoBaseDelPartido = jugadoresUnicosHoy * PRECIO_POR_PARTIDO;
       const pozoTotal = pozoBaseDelPartido + acumuladoRepartido;
       
@@ -151,7 +180,9 @@ export default function App() {
         }
       }
 
-      matchesConPozoUnsorted.push({ ...m, pozoTotal, mensajeResultado, ganadores });
+      const esGanadorEnTabla = (userName) => ganadores.some(g => g.user_name === userName);
+
+      matchesConPozoUnsorted.push({ ...m, pozoTotal, mensajeResultado, ganadores, esGanadorEnTabla });
     });
 
     acumuladoEnJuego = acumuladoParaSiguienteHora;
@@ -166,7 +197,7 @@ export default function App() {
         <form onSubmit={login} className="bg-white p-8 md:p-10 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-sm">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-black text-indigo-900 tracking-tight uppercase">Mundial Vargas</h1>
-            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: 18 Bs (3 Bs x 6 partidos).</p>
+            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: {PRECIO_POR_PARTIDO * PARTIDOS_DE_HOY.length} Bs ({PRECIO_POR_PARTIDO} Bs x {PARTIDOS_DE_HOY.length} partidos).</p>
           </div>
           <input 
             type="text" placeholder="Ingresa tu nombre..." required
@@ -328,7 +359,7 @@ export default function App() {
                           {matchPredictions.map(p => {
                             const isMyPrediction = p.user_name === user;
                             const showScore = locked || isMyPrediction;
-                            const acerto = isFinished && p.home_score === m.home_score && p.away_score === m.away_score;
+                            const acerto = isFinished && m.ganadores.some(g => g.user_name === p.user_name);
                             
                             return (
                               <tr key={p.user_name} className={isMyPrediction ? 'bg-indigo-50/50' : ''}>
@@ -390,7 +421,7 @@ export default function App() {
                         if (isMatchLocked || isMyPrediction) {
                           content = <span>{p.home_score} - {p.away_score}</span>;
                           if (m.status === 'FINISHED') {
-                            if (p.home_score === m.home_score && p.away_score === m.away_score) {
+                            if (m.esGanadorEnTabla(jugador)) {
                               bgClass = "bg-green-500 text-white shadow-inner";
                             } else {
                               bgClass = "bg-red-400 text-white shadow-inner";
