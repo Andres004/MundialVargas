@@ -12,7 +12,7 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 const FECHA_DE_PARTIDOS = "2026-06-28";
 
 // 2. El sobrante exacto de los partidos anteriores
-const POZO_AYER = 162.1875; 
+const POZO_AYER = 270; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. PARTIDOS DE ELIMINACIÓN DIRECTA.
