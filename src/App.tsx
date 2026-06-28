@@ -18,12 +18,12 @@ const PRECIO_POR_PARTIDO = 3;
 // 3. TÚ ERES LA API: Modifica los marcadores y pon status 'FINISHED'.
 // SERIE 2700: IDs nuevos para el día 27.
 const PARTIDOS_DE_HOY = [
-  { id: 2701, home_team: 'Panamá', away_team: 'Inglaterra', home_flag: 'https://flagcdn.com/w80/pa.png', away_flag: 'https://flagcdn.com/w80/gb-eng.png', home_score: 0, away_score: 0, status: 'PENDING', time: '17:00' },
-  { id: 2702, home_team: 'Croacia', away_team: 'Ghana', home_flag: 'https://flagcdn.com/w80/hr.png', away_flag: 'https://flagcdn.com/w80/gh.png', home_score: 0, away_score: 0, status: 'PENDING', time: '17:00' },
-  { id: 2703, home_team: 'Colombia', away_team: 'Portugal', home_flag: 'https://flagcdn.com/w80/co.png', away_flag: 'https://flagcdn.com/w80/pt.png', home_score: 0, away_score: 0, status: 'PENDING', time: '19:30' },
-  { id: 2704, home_team: 'RD Congo', away_team: 'Uzbekistán', home_flag: 'https://flagcdn.com/w80/cd.png', away_flag: 'https://flagcdn.com/w80/uz.png', home_score: 0, away_score: 0, status: 'PENDING', time: '19:30' },
-  { id: 2705, home_team: 'Argelia', away_team: 'Austria', home_flag: 'https://flagcdn.com/w80/dz.png', away_flag: 'https://flagcdn.com/w80/at.png', home_score: 0, away_score: 0, status: 'PENDING', time: '22:00' },
-  { id: 2706, home_team: 'Jordania', away_team: 'Argentina', home_flag: 'https://flagcdn.com/w80/jo.png', away_flag: 'https://flagcdn.com/w80/ar.png', home_score: 0, away_score: 0, status: 'PENDING', time: '22:00' }
+  { id: 2701, home_team: 'Panamá', away_team: 'Inglaterra', home_flag: 'https://flagcdn.com/w80/pa.png', away_flag: 'https://flagcdn.com/w80/gb-eng.png', home_score: 0, away_score: 2, status: 'FINISHED', time: '17:00' },
+  { id: 2702, home_team: 'Croacia', away_team: 'Ghana', home_flag: 'https://flagcdn.com/w80/hr.png', away_flag: 'https://flagcdn.com/w80/gh.png', home_score: 2, away_score: 1, status: 'FINISHED', time: '17:00' },
+  { id: 2703, home_team: 'Colombia', away_team: 'Portugal', home_flag: 'https://flagcdn.com/w80/co.png', away_flag: 'https://flagcdn.com/w80/pt.png', home_score: 0, away_score: 0, status: 'FINISHED', time: '19:30' },
+  { id: 2704, home_team: 'RD Congo', away_team: 'Uzbekistán', home_flag: 'https://flagcdn.com/w80/cd.png', away_flag: 'https://flagcdn.com/w80/uz.png', home_score: 3, away_score: 1, status: 'FINISHED', time: '19:30' },
+  { id: 2705, home_team: 'Argelia', away_team: 'Austria', home_flag: 'https://flagcdn.com/w80/dz.png', away_flag: 'https://flagcdn.com/w80/at.png', home_score: 3, away_score: 3, status: 'FINISHED', time: '22:00' },
+  { id: 2706, home_team: 'Jordania', away_team: 'Argentina', home_flag: 'https://flagcdn.com/w80/jo.png', away_flag: 'https://flagcdn.com/w80/ar.png', home_score: 1, away_score: 3, status: 'FINISHED', time: '22:00' }
 ];
 
 export default function App() {
