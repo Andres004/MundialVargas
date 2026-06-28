@@ -248,8 +248,10 @@ export default function App() {
               <div><span className="font-black text-indigo-700 block mb-1">8. Ingreso de nuevos participantes</span>Quien ingrese después de iniciado el juego podrá participar únicamente de los pozos generados desde la fecha de su ingreso y no tendrá derecho a los acumulados anteriores.</div>
               
               <div><span className="font-black text-indigo-700 block mb-1">9. Cierre del acumulado</span>Si el pozo acumulado llega hasta la final del Mundial, este se disputará únicamente en ese partido y se otorgará a quien acierte el equipo campeón. Si existen varios acertantes, el pozo se dividirá en partes iguales entre ellos.</div>
+
+              <div><span className="font-black text-indigo-700 block mb-1">10.Eliminacion directa </span> En los partidos de eliminación directa, si un jugador acierta el marcador exacto de empate al finalizar los 90 minutos, se llevará el pozo. Si ningún jugador acierta ese empate exacto, el pozo será para quien haya apostado correctamente al equipo que clasifique como ganador del partido, ya sea en tiempo suplementario o en penales.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">10. Aceptación del reglamento</span>La participación en el juego implica la aceptación total de las presentes reglas.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">11. Aceptación del reglamento</span>La participación en el juego implica la aceptación total de las presentes reglas.</div>
             </div>
           </div>
         </div>
