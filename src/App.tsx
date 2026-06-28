@@ -233,25 +233,23 @@ export default function App() {
               
               <div><span className="font-black text-indigo-700 block mb-1">1. Aporte</span>Cada participante aporta Bs 3 por partido. El pozo de cada juego se conformará con el total de los aportes de los participantes.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">2. Mecánica</span>En cada partido se pronostica únicamente el equipo ganador.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">2. Mecánica</span>Cada participante deberá enviar su pronóstico del marcador exacto antes del inicio de cada partido.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">3. En caso de penales</span>Si un partido se define por penales, para efectos del juego se considerará como ganador al equipo que gane la tanda de penales.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">3. Ganador del pozo</span>El ganador de cada encuentro será quien acierte el marcador exacto.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">4. Premios</span>El pozo de cada partido se repartirá en partes iguales entre todos los participantes que acierten el resultado.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">4. Partidos de eliminación directa</span>Si un participante acierta el marcador exacto de empate al finalizar los 90 minutos, se llevará el pozo. Si nadie acierta ese empate exacto, el pozo será para quien haya acertado al equipo que clasifique a la siguiente ronda, ya sea en tiempo suplementario o por penales.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">5. Acumulación</span>Si nadie acierta el resultado o un partido es suspendido, el pozo se acumulará para el siguiente partido. Si existen dos o más partidos programados a la misma hora, el pozo acumulado se dividirá en partes iguales entre ellos y cada partido continuará con su acumulado de forma independiente.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">5. Acumulación</span>Si nadie acierta el marcador exacto o un partido es suspendido, el pozo se acumulará para el siguiente partido. Si existen dos o más partidos programados a la misma hora, el pozo acumulado se dividirá en partes iguales entre ellos. Cada partido continuará con su acumulado de forma independiente. Si un participante acierta solo uno de esos partidos, únicamente recibirá la parte del pozo correspondiente a ese encuentro, mientras que el saldo restante continuará acumulándose.</div>
               
               <div><span className="font-black text-indigo-700 block mb-1">6. Continuidad del acumulado</span>El pozo acumulado continuará partido tras partido hasta que exista al menos un ganador.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">7. Retiro de participantes</span>Si un participante decide retirarse del juego, perderá el derecho a cualquier pozo acumulado generado hasta ese momento.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">7. Retiro e ingreso de participantes</span>Si un participante decide retirarse del juego, perderá el derecho a cualquier pozo acumulado generado hasta ese momento. Si posteriormente vuelve a ingresar, o si se incorpora un participante nuevo, deberá nivelarse con los aportes de los partidos anteriores para tener derecho a participar en los pozos acumulados.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">8. Ingreso de nuevos participantes</span>Quien ingrese después de iniciado el juego podrá participar únicamente de los pozos generados desde la fecha de su ingreso y no tendrá derecho a los acumulados anteriores.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">8. Aclaración sobre el acumulado</span>El primer día del juego el pozo acumulado se entregó en su totalidad porque no hubo partidos disputándose al mismo tiempo. La división del acumulado solo se aplicará cuando existan dos o más encuentros programados en el mismo horario.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">9. Cierre del acumulado</span>Si el pozo acumulado llega hasta la final del Mundial, este se disputará únicamente en ese partido y se otorgará a quien acierte el equipo campeón. Si existen varios acertantes, el pozo se dividirá en partes iguales entre ellos.</div>
-
-              <div><span className="font-black text-indigo-700 block mb-1">10.Eliminacion directa </span> En los partidos de eliminación directa, si un jugador acierta el marcador exacto de empate al finalizar los 90 minutos, se llevará el pozo. Si ningún jugador acierta ese empate exacto, el pozo será para quien haya apostado correctamente al equipo que clasifique como ganador del partido, ya sea en tiempo suplementario o en penales.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">9. Cierre del acumulado</span>Si el pozo acumulado llega hasta la final del Mundial, este se disputará únicamente en ese partido y se otorgará a quien acierte el marcador exacto. Si en la final hay empate al término de los 90 minutos, se aplicará lo establecido en el punto 4. Si existen varios acertantes, el pozo se dividirá en partes iguales entre ellos.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">11. Aceptación del reglamento</span>La participación en el juego implica la aceptación total de las presentes reglas.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">10. Aceptación del reglamento</span>La participación en el juego implica la aceptación total de las presentes reglas. Cualquier situación no contemplada en este reglamento será resuelta por el organizador, procurando mantener la transparencia y la equidad del juego.</div>
             </div>
           </div>
         </div>
