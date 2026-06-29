@@ -145,23 +145,29 @@ export default function App() {
       const aciertosExactos = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
       
       if (m.status === 'FINISHED') {
+        // REGLA 1: Si alguien acierta el MARCADOR EXACTO de los 90 min (sea empate o victoria), gana el pozo.
         if (aciertosExactos.length > 0) {
            ganadores = aciertosExactos;
-        } else {
-           let equipoGanadorReal = '';
-           
-           if (m.advanced_team !== '') {
-             equipoGanadorReal = m.advanced_team;
-           } else {
-             if (m.home_score > m.away_score) equipoGanadorReal = m.home_team;
-             else if (m.away_score > m.home_score) equipoGanadorReal = m.away_team;
+        } 
+        // REGLA 2: Si NADIE acierta el marcador exacto...
+        else {
+           // SOLO aplicamos el "premio por adivinar al clasificado" si el partido terminó en EMPATE en los 90 min.
+           if (m.home_score === m.away_score) {
+             let equipoGanadorReal = '';
+             if (m.advanced_team !== '') {
+               equipoGanadorReal = m.advanced_team; // El admin indicó quién ganó por penales/alargue
+             }
+             
+             if (equipoGanadorReal !== '') {
+               ganadores = matchPreds.filter(p => {
+                 if (equipoGanadorReal === m.home_team) return p.home_score > p.away_score;
+                 if (equipoGanadorReal === m.away_team) return p.away_score > p.home_score;
+                 return false;
+               });
+             }
            }
-
-           ganadores = matchPreds.filter(p => {
-             if (equipoGanadorReal === m.home_team) return p.home_score > p.away_score;
-             if (equipoGanadorReal === m.away_team) return p.away_score > p.home_score;
-             return false;
-           });
+           // Si NO terminó en empate (ej. quedó 1-0) y nadie acertó exacto, se queda vacío (ganadores = [])
+           // y el pozo se acumula automáticamente en las siguientes líneas.
         }
       }
 
@@ -173,7 +179,7 @@ export default function App() {
       if (m.status === 'FINISHED') {
         if (ganadores.length > 0) {
           const premio = (pozoTotal / ganadores.length).toFixed(2);
-          mensajeResultado = `GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
+          mensajeResultado = `🏆 GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
         } else {
           mensajeResultado = "Nadie acertó. El pozo pasa al siguiente turno.";
           acumuladoParaSiguienteHora += pozoTotal; 
