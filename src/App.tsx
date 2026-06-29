@@ -5,30 +5,55 @@ import { createClient } from '@supabase/supabase-js';
 const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_publishable_OGy26eyySr3gpRsKC1imtA_iOzL_0Hm');
 
 // =========================================================================
-// CONFIGURACIÓN DEL ADMINISTRADOR (TÚ)
+// CONFIGURACION DEL ADMINISTRADOR (TU)
 // =========================================================================
 
-// 1. FECHA EXACTA DE LOS PARTIDOS (Formato: AÑO-MES-DIA). 
-const FECHA_DE_PARTIDOS = "2026-06-28";
+// 1. FECHA EXACTA DE LOS PARTIDOS
+const FECHA_DE_PARTIDOS = "2026-06-29";
 
-// 2. El sobrante exacto de los partidos anteriores
-const POZO_AYER = 270; 
+// 2. El sobrante exacto de los partidos anteriores. 
+// (Cambia este 303 por el pozo acumulado real de ayer si es diferente)
+const POZO_AYER = 282; 
 const PRECIO_POR_PARTIDO = 3; 
 
-// 3. PARTIDOS DE ELIMINACIÓN DIRECTA.
-// advanced_team: Si el partido terminó en empate en los 90 min y se fueron a penales, 
-// escribe aquí el nombre del equipo que pasó. Si NO hubo empate, déjalo vacío ('').
+// 3. PARTIDOS DE ELIMINACION DIRECTA.
+// advanced_team: Si el partido termino en empate en los 90 min y se fueron a penales, 
+// escribe aqui el nombre del equipo que paso. Si NO hubo empate, dejalo vacio ('').
 const PARTIDOS_DE_HOY = [
   { 
-    id: 2801, 
-    home_team: 'Sudáfrica', 
-    away_team: 'Canadá', 
-    home_flag: 'https://flagcdn.com/w80/za.png', 
-    away_flag: 'https://flagcdn.com/w80/ca.png', 
+    id: 2901, 
+    home_team: 'Brasil', 
+    away_team: 'Japón', 
+    home_flag: 'https://flagcdn.com/w80/br.png', 
+    away_flag: 'https://flagcdn.com/w80/jp.png', 
     home_score: 0, 
-    away_score: 1, 
-    status: 'FINISHED', 
-    time: '15:00',
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '13:00',
+    advanced_team: '' 
+  },
+  { 
+    id: 2902, 
+    home_team: 'Alemania', 
+    away_team: 'Paraguay', 
+    home_flag: 'https://flagcdn.com/w80/de.png', 
+    away_flag: 'https://flagcdn.com/w80/py.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '16:30',
+    advanced_team: '' 
+  },
+  { 
+    id: 2903, 
+    home_team: 'Países Bajos', 
+    away_team: 'Marruecos', 
+    home_flag: 'https://flagcdn.com/w80/nl.png', 
+    away_flag: 'https://flagcdn.com/w80/ma.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '21:00',
     advanced_team: '' 
   }
 ];
@@ -145,17 +170,13 @@ export default function App() {
       const aciertosExactos = matchPreds.filter(p => p.home_score === m.home_score && p.away_score === m.away_score);
       
       if (m.status === 'FINISHED') {
-        // REGLA 1: Si alguien acierta el MARCADOR EXACTO de los 90 min (sea empate o victoria), gana el pozo.
         if (aciertosExactos.length > 0) {
            ganadores = aciertosExactos;
-        } 
-        // REGLA 2: Si NADIE acierta el marcador exacto...
-        else {
-           // SOLO aplicamos el "premio por adivinar al clasificado" si el partido terminó en EMPATE en los 90 min.
+        } else {
            if (m.home_score === m.away_score) {
              let equipoGanadorReal = '';
              if (m.advanced_team !== '') {
-               equipoGanadorReal = m.advanced_team; // El admin indicó quién ganó por penales/alargue
+               equipoGanadorReal = m.advanced_team; 
              }
              
              if (equipoGanadorReal !== '') {
@@ -166,8 +187,6 @@ export default function App() {
                });
              }
            }
-           // Si NO terminó en empate (ej. quedó 1-0) y nadie acertó exacto, se queda vacío (ganadores = [])
-           // y el pozo se acumula automáticamente en las siguientes líneas.
         }
       }
 
@@ -179,7 +198,7 @@ export default function App() {
       if (m.status === 'FINISHED') {
         if (ganadores.length > 0) {
           const premio = (pozoTotal / ganadores.length).toFixed(2);
-          mensajeResultado = `🏆 GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
+          mensajeResultado = `GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
         } else {
           mensajeResultado = "Nadie acertó. El pozo pasa al siguiente turno.";
           acumuladoParaSiguienteHora += pozoTotal; 
@@ -224,7 +243,7 @@ export default function App() {
     <div className="min-h-screen bg-[#f8fafc] text-slate-800 pb-12" style={{ fontFamily: "'Outfit', sans-serif" }}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap');`}</style>
       
-      {/* MODAL DEL REGLAMENTO */}
+      {/* MODAL DEL REGLAMENTO ACTUALIZADO */}
       {showRules && (
         <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 transition-opacity">
           <div className="bg-white rounded-[2rem] w-full max-w-2xl max-h-[85vh] overflow-hidden flex flex-col shadow-2xl border border-slate-200">
@@ -235,27 +254,27 @@ export default function App() {
               </button>
             </div>
             <div className="p-6 md:p-8 overflow-y-auto space-y-6 text-sm md:text-base text-slate-600 scrollbar-thin">
-              <p className="text-center font-black text-indigo-900 mb-6 uppercase text-lg">REGLAMENTO DEL JUEGO DE PRONÓSTICOS <br/>MUNDIAL DE FÚTBOL</p>
+              <p className="text-center font-black text-indigo-900 mb-6 uppercase text-lg">REGLAMENTO DEL JUEGO DE PRONOSTICOS <br/>MUNDIAL DE FUTBOL</p>
               
-              <div><span className="font-black text-indigo-700 block mb-1">1. Aporte</span>Cada participante aporta Bs 3 por partido. El pozo de cada juego se conformará con el total de los aportes de los participantes.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">1. Aporte</span>Cada participante aporta Bs 3 por partido. El pozo de cada juego se conformara con el total de los aportes de los participantes.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">2. Mecánica</span>Cada participante deberá enviar su pronóstico del marcador exacto antes del inicio de cada partido.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">2. Mecanica</span>Cada participante debera enviar su pronostico del marcador exacto antes del inicio de cada partido.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">3. Ganador del pozo</span>El ganador de cada encuentro será quien acierte el marcador exacto.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">3. Ganador del pozo</span>El ganador de cada encuentro sera quien acierte el marcador exacto.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">4. Partidos de eliminación directa</span>Si un participante acierta el marcador exacto de empate al finalizar los 90 minutos, se llevará el pozo. Si nadie acierta ese empate exacto, el pozo será para quien haya acertado al equipo que clasifique a la siguiente ronda, ya sea en tiempo suplementario o por penales.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">4. Partidos de eliminacion directa</span>Si un participante acierta el marcador exacto de empate al finalizar los 90 minutos, se llevara el pozo. Si nadie acierta ese empate exacto, el pozo sera para quien haya acertado al equipo que clasifique a la siguiente ronda, ya sea en tiempo suplementario o por penales.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">5. Acumulación</span>Si nadie acierta el marcador exacto o un partido es suspendido, el pozo se acumulará para el siguiente partido. Si existen dos o más partidos programados a la misma hora, el pozo acumulado se dividirá en partes iguales entre ellos. Cada partido continuará con su acumulado de forma independiente. Si un participante acierta solo uno de esos partidos, únicamente recibirá la parte del pozo correspondiente a ese encuentro, mientras que el saldo restante continuará acumulándose.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">5. Acumulacion</span>Si nadie acierta el marcador exacto o un partido es suspendido, el pozo se acumulara para el siguiente partido. Si existen dos o mas partidos programados a la misma hora, el pozo acumulado se dividira en partes iguales entre ellos. Cada partido continuara con su acumulado de forma independiente. Si un participante acierta solo uno de esos partidos, unicamente recibira la parte del pozo correspondiente a ese encuentro, mientras que el saldo restante continuara acumulandose.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">6. Continuidad del acumulado</span>El pozo acumulado continuará partido tras partido hasta que exista al menos un ganador.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">6. Continuidad del acumulado</span>El pozo acumulado continuara partido tras partido hasta que exista al menos un ganador.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">7. Retiro e ingreso de participantes</span>Si un participante decide retirarse del juego, perderá el derecho a cualquier pozo acumulado generado hasta ese momento. Si posteriormente vuelve a ingresar, o si se incorpora un participante nuevo, deberá nivelarse con los aportes de los partidos anteriores para tener derecho a participar en los pozos acumulados.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">7. Retiro e ingreso de participantes</span>Si un participante decide retirarse del juego, perdera el derecho a cualquier pozo acumulado generado hasta ese momento. Si posteriormente vuelve a ingresar, o si se incorpora un participante nuevo, debera nivelarse con los aportes de los partidos anteriores para tener derecho a participar en los pozos acumulados.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">8. Aclaración sobre el acumulado</span>El primer día del juego el pozo acumulado se entregó en su totalidad porque no hubo partidos disputándose al mismo tiempo. La división del acumulado solo se aplicará cuando existan dos o más encuentros programados en el mismo horario.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">8. Aclaracion sobre el acumulado</span>El primer dia del juego el pozo acumulado se entrego en su totalidad porque no hubo partidos disputandose al mismo tiempo. La division del acumulado solo se aplicara cuando existan dos o mas encuentros programados en el mismo horario.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">9. Cierre del acumulado</span>Si el pozo acumulado llega hasta la final del Mundial, este se disputará únicamente en ese partido y se otorgará a quien acierte el marcador exacto. Si en la final hay empate al término de los 90 minutos, se aplicará lo establecido en el punto 4. Si existen varios acertantes, el pozo se dividirá en partes iguales entre ellos.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">9. Cierre del acumulado</span>Si el pozo acumulado llega hasta la final del Mundial, este se disputara unicamente en ese partido y se otorgara a quien acierte el marcador exacto. Si en la final hay empate al termino de los 90 minutos, se aplicara lo establecido en el punto 4. Si existen varios acertantes, el pozo se dividira en partes iguales entre ellos.</div>
               
-              <div><span className="font-black text-indigo-700 block mb-1">10. Aceptación del reglamento</span>La participación en el juego implica la aceptación total de las presentes reglas. Cualquier situación no contemplada en este reglamento será resuelta por el organizador, procurando mantener la transparencia y la equidad del juego.</div>
+              <div><span className="font-black text-indigo-700 block mb-1">10. Aceptacion del reglamento</span>La participacion en el juego implica la aceptacion total de las presentes reglas. Cualquier situacion no contemplada en este reglamento sera resuelta por el organizador, procurando mantener la transparencia y la equidad del juego.</div>
             </div>
           </div>
         </div>
@@ -272,7 +291,7 @@ export default function App() {
           <p className="text-sm text-slate-500 mt-2 font-bold">Jugador: <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">{user}</span> | Activos Hoy: {jugadoresUnicosHoy}</p>
         </div>
         <div className="bg-indigo-50 px-6 py-2.5 rounded-2xl border border-indigo-100 text-center w-full md:w-auto shadow-inner">
-          <p className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">Recaudación de Hoy</p>
+          <p className="text-indigo-400 text-[10px] font-black uppercase tracking-widest">Recaudacion de Hoy</p>
           <p className="text-3xl font-black text-indigo-700">{recaudacionTotalDelDia} <span className="text-base">Bs</span></p>
         </div>
       </header>
@@ -346,12 +365,12 @@ export default function App() {
                       />
                     </div>
                     <p className="text-[10px] text-center text-indigo-400 font-bold mt-2 uppercase tracking-widest animate-pulse">
-                      Se guarda automáticamente
+                      Se guarda automaticamente
                     </p>
                   </div>
                 ) : (
                   <div className="bg-slate-50 p-4 rounded-2xl text-center border border-slate-200 mb-6">
-                    <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">Tu predicción</p>
+                    <p className="text-[10px] text-slate-400 uppercase font-black mb-1 tracking-widest">Tu prediccion</p>
                     <p className="text-2xl font-black text-indigo-600">{myP?.home_score ?? '-'} : {myP?.away_score ?? '-'}</p>
                   </div>
                 )}
@@ -384,7 +403,7 @@ export default function App() {
                       </table>
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400 italic text-center font-bold">Nadie apostó aún.</p>
+                    <p className="text-xs text-slate-400 italic text-center font-bold">Nadie aposto aun.</p>
                   )}
                 </div>
 
