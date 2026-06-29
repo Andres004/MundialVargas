@@ -13,7 +13,7 @@ const FECHA_DE_PARTIDOS = "2026-06-29";
 
 // 2. El sobrante exacto de los partidos anteriores. 
 // (Cambia este 303 por el pozo acumulado real de ayer si es diferente)
-const POZO_AYER = 282; 
+const POZO_AYER = 303; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. PARTIDOS DE ELIMINACION DIRECTA.
@@ -138,7 +138,7 @@ export default function App() {
     const matchDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0, 0);
     
     const diffMinutes = (matchDate.getTime() - currentTime.getTime()) / 60000;
-    return diffMinutes <= 30; 
+    return diffMinutes <= 0; // Se cambio de 30 a 0 para que cierre exactamente a la hora del partido
   };
 
   const idsDeHoy = PARTIDOS_DE_HOY.map(m => m.id);
@@ -222,7 +222,7 @@ export default function App() {
         <form onSubmit={login} className="bg-white p-8 md:p-10 rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-sm">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-black text-indigo-900 tracking-tight uppercase">Mundial Vargas</h1>
-            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del día: {PRECIO_POR_PARTIDO * PARTIDOS_DE_HOY.length} Bs ({PRECIO_POR_PARTIDO} Bs x {PARTIDOS_DE_HOY.length} partidos).</p>
+            <p className="text-slate-500 text-sm mt-3 font-bold">Costo del dia: {PRECIO_POR_PARTIDO * PARTIDOS_DE_HOY.length} Bs ({PRECIO_POR_PARTIDO} Bs x {PARTIDOS_DE_HOY.length} partidos).</p>
           </div>
           <input 
             type="text" placeholder="Ingresa tu nombre..." required
