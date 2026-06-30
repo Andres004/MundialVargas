@@ -37,9 +37,9 @@ const PARTIDOS_DE_HOY = [
     away_team: 'Suecia', 
     home_flag: 'https://flagcdn.com/w80/fr.png', 
     away_flag: 'https://flagcdn.com/w80/se.png', 
-    home_score: 0, 
+    home_score: 3, 
     away_score: 0, 
-    status: 'PENDING', 
+    status: 'FINISHED', 
     time: '17:00',
     advanced_team: '' 
   },
