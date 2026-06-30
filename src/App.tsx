@@ -9,11 +9,10 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS
-const FECHA_DE_PARTIDOS = "2026-06-29";
+const FECHA_DE_PARTIDOS = "2026-06-30";
 
 // 2. El sobrante exacto de los partidos anteriores. 
-// (Cambia este 303 por el pozo acumulado real de ayer si es diferente)
-const POZO_AYER = 303; 
+const POZO_AYER = 54; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. PARTIDOS DE ELIMINACION DIRECTA.
@@ -21,38 +20,38 @@ const PRECIO_POR_PARTIDO = 3;
 // escribe aqui el nombre del equipo que paso. Si NO hubo empate, dejalo vacio ('').
 const PARTIDOS_DE_HOY = [
   { 
-    id: 2901, 
-    home_team: 'Brasil', 
-    away_team: 'Japón', 
-    home_flag: 'https://flagcdn.com/w80/br.png', 
-    away_flag: 'https://flagcdn.com/w80/jp.png', 
-    home_score: 2, 
-    away_score: 1, 
-    status: 'FINISHED', 
+    id: 3001, 
+    home_team: 'Costa de Marfil', 
+    away_team: 'Noruega', 
+    home_flag: 'https://flagcdn.com/w80/ci.png', 
+    away_flag: 'https://flagcdn.com/w80/no.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
     time: '13:00',
     advanced_team: '' 
   },
   { 
-    id: 2902, 
-    home_team: 'Alemania', 
-    away_team: 'Paraguay', 
-    home_flag: 'https://flagcdn.com/w80/de.png', 
-    away_flag: 'https://flagcdn.com/w80/py.png', 
-    home_score: 1, 
-    away_score: 1, 
-    status: 'FINISHED', 
-    time: '16:30',
+    id: 3002, 
+    home_team: 'Francia', 
+    away_team: 'Suecia', 
+    home_flag: 'https://flagcdn.com/w80/fr.png', 
+    away_flag: 'https://flagcdn.com/w80/se.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '17:00',
     advanced_team: '' 
   },
   { 
-    id: 2903, 
-    home_team: 'Países Bajos', 
-    away_team: 'Marruecos', 
-    home_flag: 'https://flagcdn.com/w80/nl.png', 
-    away_flag: 'https://flagcdn.com/w80/ma.png', 
-    home_score: 1, 
-    away_score: 1, 
-    status: 'FINISHED', 
+    id: 3003, 
+    home_team: 'México', 
+    away_team: 'Ecuador', 
+    home_flag: 'https://flagcdn.com/w80/mx.png', 
+    away_flag: 'https://flagcdn.com/w80/ec.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
     time: '21:00',
     advanced_team: '' 
   }
