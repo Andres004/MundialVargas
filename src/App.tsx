@@ -25,9 +25,9 @@ const PARTIDOS_DE_HOY = [
     away_team: 'Noruega', 
     home_flag: 'https://flagcdn.com/w80/ci.png', 
     away_flag: 'https://flagcdn.com/w80/no.png', 
-    home_score: 0, 
-    away_score: 0, 
-    status: 'PENDING', 
+    home_score: 1, 
+    away_score: 2, 
+    status: 'FINISHED', 
     time: '13:00',
     advanced_team: '' 
   },
