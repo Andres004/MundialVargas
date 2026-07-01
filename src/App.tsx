@@ -49,9 +49,9 @@ const PARTIDOS_DE_HOY = [
     away_team: 'Ecuador', 
     home_flag: 'https://flagcdn.com/w80/mx.png', 
     away_flag: 'https://flagcdn.com/w80/ec.png', 
-    home_score: 0, 
+    home_score: 2, 
     away_score: 0, 
-    status: 'PENDING', 
+    status: 'FINISHED', 
     time: '21:00',
     advanced_team: '' 
   }
