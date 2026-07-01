@@ -9,10 +9,10 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS
-const FECHA_DE_PARTIDOS = "2026-06-30";
+const FECHA_DE_PARTIDOS = "2026-07-01";
 
 // 2. El sobrante exacto de los partidos anteriores. 
-const POZO_AYER = 54; 
+const POZO_AYER = 27; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. PARTIDOS DE ELIMINACION DIRECTA.
@@ -20,39 +20,39 @@ const PRECIO_POR_PARTIDO = 3;
 // escribe aqui el nombre del equipo que paso. Si NO hubo empate, dejalo vacio ('').
 const PARTIDOS_DE_HOY = [
   { 
-    id: 3001, 
-    home_team: 'Costa de Marfil', 
-    away_team: 'Noruega', 
-    home_flag: 'https://flagcdn.com/w80/ci.png', 
-    away_flag: 'https://flagcdn.com/w80/no.png', 
-    home_score: 1, 
-    away_score: 2, 
-    status: 'FINISHED', 
-    time: '13:00',
+    id: 3101, 
+    home_team: 'Inglaterra', 
+    away_team: 'RD Congo', 
+    home_flag: 'https://flagcdn.com/w80/gb-eng.png', 
+    away_flag: 'https://flagcdn.com/w80/cd.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '12:00',
     advanced_team: '' 
   },
   { 
-    id: 3002, 
-    home_team: 'Francia', 
-    away_team: 'Suecia', 
-    home_flag: 'https://flagcdn.com/w80/fr.png', 
-    away_flag: 'https://flagcdn.com/w80/se.png', 
-    home_score: 3, 
+    id: 3102, 
+    home_team: 'Bélgica', 
+    away_team: 'Senegal', 
+    home_flag: 'https://flagcdn.com/w80/be.png', 
+    away_flag: 'https://flagcdn.com/w80/sn.png', 
+    home_score: 0, 
     away_score: 0, 
-    status: 'FINISHED', 
-    time: '17:00',
+    status: 'PENDING', 
+    time: '16:00',
     advanced_team: '' 
   },
   { 
-    id: 3003, 
-    home_team: 'México', 
-    away_team: 'Ecuador', 
-    home_flag: 'https://flagcdn.com/w80/mx.png', 
-    away_flag: 'https://flagcdn.com/w80/ec.png', 
-    home_score: 2, 
+    id: 3103, 
+    home_team: 'Estados Unidos', 
+    away_team: 'Bosnia y Herzegovina', 
+    home_flag: 'https://flagcdn.com/w80/us.png', 
+    away_flag: 'https://flagcdn.com/w80/ba.png', 
+    home_score: 0, 
     away_score: 0, 
-    status: 'FINISHED', 
-    time: '21:00',
+    status: 'PENDING', 
+    time: '20:00',
     advanced_team: '' 
   }
 ];
@@ -137,7 +137,7 @@ export default function App() {
     const matchDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hours), parseInt(minutes), 0, 0);
     
     const diffMinutes = (matchDate.getTime() - currentTime.getTime()) / 60000;
-    return diffMinutes <= 0; // Se cambio de 30 a 0 para que cierre exactamente a la hora del partido
+    return diffMinutes <= 0; 
   };
 
   const idsDeHoy = PARTIDOS_DE_HOY.map(m => m.id);
@@ -199,7 +199,7 @@ export default function App() {
           const premio = (pozoTotal / ganadores.length).toFixed(2);
           mensajeResultado = `GANADOR(ES): ${ganadores.map(g => g.user_name).join(', ')} (PREMIO: ${premio} Bs)`;
         } else {
-          mensajeResultado = "Nadie acertó. El pozo pasa al siguiente turno.";
+          mensajeResultado = "Nadie acerto. El pozo pasa al siguiente turno.";
           acumuladoParaSiguienteHora += pozoTotal; 
         }
       }
