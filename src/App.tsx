@@ -9,10 +9,10 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS
-const FECHA_DE_PARTIDOS = "2026-07-01";
+const FECHA_DE_PARTIDOS = "2026-07-02";
 
 // 2. El sobrante exacto de los partidos anteriores. 
-const POZO_AYER = 27; 
+const POZO_AYER = 0; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. PARTIDOS DE ELIMINACION DIRECTA.
@@ -20,39 +20,39 @@ const PRECIO_POR_PARTIDO = 3;
 // escribe aqui el nombre del equipo que paso. Si NO hubo empate, dejalo vacio ('').
 const PARTIDOS_DE_HOY = [
   { 
-    id: 3101, 
-    home_team: 'Inglaterra', 
-    away_team: 'RD Congo', 
-    home_flag: 'https://flagcdn.com/w80/gb-eng.png', 
-    away_flag: 'https://flagcdn.com/w80/cd.png', 
-    home_score: 2, 
-    away_score: 1, 
-    status: 'FINISHED', 
-    time: '12:00',
-    advanced_team: '' 
-  },
-  { 
-    id: 3102, 
-    home_team: 'Bélgica', 
-    away_team: 'Senegal', 
-    home_flag: 'https://flagcdn.com/w80/be.png', 
-    away_flag: 'https://flagcdn.com/w80/sn.png', 
-    home_score: 3, 
-    away_score: 2, 
-    status: 'FINISHED', 
-    time: '16:00',
-    advanced_team: '' 
-  },
-  { 
-    id: 3103, 
-    home_team: 'Estados Unidos', 
-    away_team: 'Bosnia y Herzegovina', 
-    home_flag: 'https://flagcdn.com/w80/us.png', 
-    away_flag: 'https://flagcdn.com/w80/ba.png', 
-    home_score: 2, 
+    id: 3201, 
+    home_team: 'España', 
+    away_team: 'Austria', 
+    home_flag: 'https://flagcdn.com/w80/es.png', 
+    away_flag: 'https://flagcdn.com/w80/at.png', 
+    home_score: 0, 
     away_score: 0, 
-    status: 'FINISHED', 
-    time: '20:00',
+    status: 'PENDING', 
+    time: '15:00',
+    advanced_team: '' 
+  },
+  { 
+    id: 3202, 
+    home_team: 'Portugal', 
+    away_team: 'Croacia', 
+    home_flag: 'https://flagcdn.com/w80/pt.png', 
+    away_flag: 'https://flagcdn.com/w80/hr.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '19:00',
+    advanced_team: '' 
+  },
+  { 
+    id: 3203, 
+    home_team: 'Suiza', 
+    away_team: 'Argelia', 
+    home_flag: 'https://flagcdn.com/w80/ch.png', 
+    away_flag: 'https://flagcdn.com/w80/dz.png', 
+    home_score: 0, 
+    away_score: 0, 
+    status: 'PENDING', 
+    time: '23:00',
     advanced_team: '' 
   }
 ];
