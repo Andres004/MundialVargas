@@ -49,9 +49,9 @@ const PARTIDOS_DE_HOY = [
     away_team: 'Bosnia y Herzegovina', 
     home_flag: 'https://flagcdn.com/w80/us.png', 
     away_flag: 'https://flagcdn.com/w80/ba.png', 
-    home_score: 0, 
+    home_score: 2, 
     away_score: 0, 
-    status: 'PENDING', 
+    status: 'FINISHED', 
     time: '20:00',
     advanced_team: '' 
   }
