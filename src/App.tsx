@@ -9,9 +9,10 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS
-const FECHA_DE_PARTIDOS = "2026-07-02";
+const FECHA_DE_PARTIDOS = "2026-07-03";
 
 // 2. El sobrante exacto de los partidos anteriores. 
+// OJO: Cambia este 0 por el pozo acumulado real de ayer si alguien no gano.
 const POZO_AYER = 0; 
 const PRECIO_POR_PARTIDO = 3; 
 
@@ -20,39 +21,39 @@ const PRECIO_POR_PARTIDO = 3;
 // escribe aqui el nombre del equipo que paso. Si NO hubo empate, dejalo vacio ('').
 const PARTIDOS_DE_HOY = [
   { 
-    id: 3201, 
-    home_team: 'España', 
-    away_team: 'Austria', 
-    home_flag: 'https://flagcdn.com/w80/es.png', 
-    away_flag: 'https://flagcdn.com/w80/at.png', 
+    id: 3301, 
+    home_team: 'Australia', 
+    away_team: 'Egipto', 
+    home_flag: 'https://flagcdn.com/w80/au.png', 
+    away_flag: 'https://flagcdn.com/w80/eg.png', 
     home_score: 0, 
     away_score: 0, 
     status: 'PENDING', 
-    time: '15:00',
+    time: '14:00',
     advanced_team: '' 
   },
   { 
-    id: 3202, 
-    home_team: 'Portugal', 
-    away_team: 'Croacia', 
-    home_flag: 'https://flagcdn.com/w80/pt.png', 
-    away_flag: 'https://flagcdn.com/w80/hr.png', 
+    id: 3302, 
+    home_team: 'Argentina', 
+    away_team: 'Cabo Verde', 
+    home_flag: 'https://flagcdn.com/w80/ar.png', 
+    away_flag: 'https://flagcdn.com/w80/cv.png', 
     home_score: 0, 
     away_score: 0, 
     status: 'PENDING', 
-    time: '19:00',
+    time: '18:00',
     advanced_team: '' 
   },
   { 
-    id: 3203, 
-    home_team: 'Suiza', 
-    away_team: 'Argelia', 
-    home_flag: 'https://flagcdn.com/w80/ch.png', 
-    away_flag: 'https://flagcdn.com/w80/dz.png', 
+    id: 3303, 
+    home_team: 'Colombia', 
+    away_team: 'Ghana', 
+    home_flag: 'https://flagcdn.com/w80/co.png', 
+    away_flag: 'https://flagcdn.com/w80/gh.png', 
     home_score: 0, 
     away_score: 0, 
     status: 'PENDING', 
-    time: '23:00',
+    time: '21:30',
     advanced_team: '' 
   }
 ];
