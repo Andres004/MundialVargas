@@ -38,8 +38,8 @@ const PARTIDOS_DE_HOY = [
     home_flag: 'https://flagcdn.com/w80/py.png', 
     away_flag: 'https://flagcdn.com/w80/fr.png', 
     home_score: 0, 
-    away_score: 0, 
-    status: 'PENDING', 
+    away_score: 1, 
+    status: 'FINISHED', 
     time: '17:00',
     advanced_team: '' 
   }
