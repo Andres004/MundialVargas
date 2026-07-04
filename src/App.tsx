@@ -133,6 +133,10 @@ export default function App() {
   
   const jugadoresUnicosSet = new Set(prediccionesDeHoy.map(p => p.user_name));
   const jugadoresUnicosHoy = jugadoresUnicosSet.size;
+
+  // NUEVO: Verificamos cuantas predicciones tiene el usuario actual hoy
+  const misPrediccionesHoy = prediccionesDeHoy.filter(p => p.user_name === user);
+  const faltanPredicciones = misPrediccionesHoy.length < PARTIDOS_DE_HOY.length;
   
   let acumuladoEnJuego = POZO_AYER; 
 
@@ -283,6 +287,15 @@ export default function App() {
         </div>
       </header>
 
+      {/* NUEVO: ALERTA PARA FORZAR A JUGAR */}
+      {faltanPredicciones && (
+        <div className="bg-red-500 text-white p-3 text-center shadow-inner animate-pulse">
+          <p className="text-[11px] md:text-sm font-black uppercase tracking-widest">
+            AUN NO ESTAS PARTICIPANDO EN TODOS LOS PARTIDOS. ¡INGRESA TUS PRONOSTICOS PARA ENTRAR AL POZO!
+          </p>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-4 mt-10">
         <div className="grid gap-8 md:grid-cols-2">
           {matchesConPozo.map(m => {
@@ -291,6 +304,9 @@ export default function App() {
             const locked = isLocked(m.time) || isFinished;
             const matchPredictions = prediccionesDeHoy.filter(p => p.match_id === m.id);
             
+            // Verificamos si este usuario ya apostó en este partido especifico
+            const miApuestaEnEstePartido = myP && myP.home_score !== '' && myP.away_score !== '';
+
             return (
               <div key={m.id} className="bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100 shadow-lg relative flex flex-col hover:shadow-xl transition-shadow">
                 
@@ -364,7 +380,14 @@ export default function App() {
 
                 <div className="mt-auto border-t border-slate-100 pt-5">
                   <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Apuestas de la Familia</h3>
-                  {matchPredictions.length > 0 ? (
+                  
+                  {/* NUEVO: LÓGICA ANTI-ESPÍA */}
+                  {!miApuestaEnEstePartido && !locked ? (
+                    <div className="p-4 bg-slate-100 rounded-xl text-center border border-slate-200">
+                      <p className="text-[11px] font-black text-slate-500 uppercase tracking-widest">Modo Espia Bloqueado</p>
+                      <p className="text-[10px] text-slate-400 mt-1 font-bold">Ingresa tu pronostico arriba para poder ver lo que apostaron los demas.</p>
+                    </div>
+                  ) : matchPredictions.length > 0 ? (
                     <div className="max-h-40 overflow-y-auto pr-2 scrollbar-thin">
                       <table className="w-full text-left text-sm">
                         <tbody className="divide-y divide-slate-100">
