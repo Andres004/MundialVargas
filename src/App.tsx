@@ -9,11 +9,10 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS
-const FECHA_DE_PARTIDOS = "2026-07-03";
+const FECHA_DE_PARTIDOS = "2026-07-04";
 
 // 2. El sobrante exacto de los partidos anteriores. 
-// OJO: Cambia este 0 por el pozo acumulado real de ayer si alguien no gano.
-const POZO_AYER = 0; 
+const POZO_AYER = 60; 
 const PRECIO_POR_PARTIDO = 3; 
 
 // 3. PARTIDOS DE ELIMINACION DIRECTA.
@@ -21,39 +20,27 @@ const PRECIO_POR_PARTIDO = 3;
 // escribe aqui el nombre del equipo que paso. Si NO hubo empate, dejalo vacio ('').
 const PARTIDOS_DE_HOY = [
   { 
-    id: 3301, 
-    home_team: 'Australia', 
-    away_team: 'Egipto', 
-    home_flag: 'https://flagcdn.com/w80/au.png', 
-    away_flag: 'https://flagcdn.com/w80/eg.png', 
+    id: 3401, 
+    home_team: 'Canadá', 
+    away_team: 'Marruecos', 
+    home_flag: 'https://flagcdn.com/w80/ca.png', 
+    away_flag: 'https://flagcdn.com/w80/ma.png', 
     home_score: 0, 
     away_score: 0, 
     status: 'PENDING', 
-    time: '14:00',
+    time: '13:00',
     advanced_team: '' 
   },
   { 
-    id: 3302, 
-    home_team: 'Argentina', 
-    away_team: 'Cabo Verde', 
-    home_flag: 'https://flagcdn.com/w80/ar.png', 
-    away_flag: 'https://flagcdn.com/w80/cv.png', 
+    id: 3402, 
+    home_team: 'Paraguay', 
+    away_team: 'Francia', 
+    home_flag: 'https://flagcdn.com/w80/py.png', 
+    away_flag: 'https://flagcdn.com/w80/fr.png', 
     home_score: 0, 
     away_score: 0, 
     status: 'PENDING', 
-    time: '18:00',
-    advanced_team: '' 
-  },
-  { 
-    id: 3303, 
-    home_team: 'Colombia', 
-    away_team: 'Ghana', 
-    home_flag: 'https://flagcdn.com/w80/co.png', 
-    away_flag: 'https://flagcdn.com/w80/gh.png', 
-    home_score: 0, 
-    away_score: 0, 
-    status: 'PENDING', 
-    time: '21:30',
+    time: '17:00',
     advanced_team: '' 
   }
 ];
