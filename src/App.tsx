@@ -13,7 +13,7 @@ const FECHA_DE_PARTIDOS = "2026-07-14";
 
 // 2. El sobrante exacto de los partidos anteriores. 
 const POZO_AYER = 0; 
-const PRECIO_POR_PARTIDO = 3; 
+const PRECIO_POR_PARTIDO = 5; 
 
 // 3. PARTIDOS DE ELIMINACION DIRECTA.
 // advanced_team: Si el partido termino en empate en los 90 min y se fueron a penales, 
