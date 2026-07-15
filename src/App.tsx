@@ -9,7 +9,7 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 // =========================================================================
 
 // 1. FECHA EXACTA DE LOS PARTIDOS
-const FECHA_DE_PARTIDOS = "2026-07-14";
+const FECHA_DE_PARTIDOS = "2026-07-15";
 
 // 2. El sobrante exacto de los partidos anteriores. 
 const POZO_AYER = 45; 
