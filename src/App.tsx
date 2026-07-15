@@ -12,7 +12,7 @@ const supabase = createClient('https://spulkmtcpxjxqcolkiuo.supabase.co', 'sb_pu
 const FECHA_DE_PARTIDOS = "2026-07-14";
 
 // 2. El sobrante exacto de los partidos anteriores. 
-const POZO_AYER = 0; 
+const POZO_AYER = 45; 
 const PRECIO_POR_PARTIDO = 5; 
 
 // 3. PARTIDOS DE ELIMINACION DIRECTA.
@@ -20,11 +20,11 @@ const PRECIO_POR_PARTIDO = 5;
 // escribe aqui el nombre del equipo que paso. Si NO hubo empate, dejalo vacio ('').
 const PARTIDOS_DE_HOY = [
   { 
-    id: 5001, 
-    home_team: 'España', 
-    away_team: 'Francia',
-    home_flag: 'https://flagcdn.com/w80/es.png', 
-    away_flag: 'https://flagcdn.com/w80/fr.png', 
+    id: 6001, 
+    home_team: 'Argentina', 
+    away_team: 'Inglaterra',
+    home_flag: 'https://flagcdn.com/w80/ar.png', 
+    away_flag: 'https://flagcdn.com/w80/gb-eng.png', 
     home_score: 0, 
     away_score: 0, 
     status: 'PENDING', 
